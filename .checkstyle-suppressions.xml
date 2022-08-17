@@ -28,6 +28,13 @@
   <suppress checks="LocalVariable"
             files="io/opsit/explang/parser/lisp/LispParser.java"/>
   <suppress checks="AvoidStarImport"
-             files="io/opsit/explang/Compiler.java"/>  
- 
+            files="io/opsit/explang/Compiler.java"/>
+  <suppress checks=".*"
+            files="io/opsit/explang/parser/alg/AlgParserParser.java"/>
+  <suppress checks=".*"
+            files="io/opsit/explang/parser/alg/AlgParserLexer.java"/>
+  <suppress checks=".*"
+            files="io/opsit/explang/parser/alg/AlgParserVisitor.java"/>
+  <suppress checks=".*"
+            files="io/opsit/explang/parser/alg/AlgParserBaseVisitor.java"/>
 </suppressions>

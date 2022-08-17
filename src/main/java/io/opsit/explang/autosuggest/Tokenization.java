@@ -1,8 +1,7 @@
 package io.opsit.explang.autosuggest;
 
-import java.util.List;
 import java.util.ArrayList;
-
+import java.util.List;
 
 public class Tokenization {
   public String token;
@@ -28,7 +27,7 @@ public class Tokenization {
     this.token = "";
     this.tokenPos = 0;
   }
-    
+
   public Tokenization(List<LanguageToken> tokens, Integer tokenIndex, String token, int tokenPos) {
     this.tokens = tokens;
     this.tokenIndex = tokenIndex;

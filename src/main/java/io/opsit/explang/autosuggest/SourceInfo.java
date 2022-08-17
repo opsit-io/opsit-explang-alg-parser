@@ -1,12 +1,11 @@
 package io.opsit.explang.autosuggest;
 
-import java.util.List;
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class SourceInfo {
-  public SourceInfo(String rawString,
-                    int rawPos) {
+  public SourceInfo(String rawString, int rawPos) {
     super();
     this.rawString = rawString;
     this.rawPos = rawPos;
@@ -19,14 +18,14 @@ public class SourceInfo {
   // unparsed line
   public String rawString;
   public int rawPos;
-    
-  public List <String> errors;
-  public List <Suggestion>  suggestions;
+
+  public List<String> errors;
+  public List<Suggestion> suggestions;
 
   public void addAll(Collection<Suggestion> items) {
     this.suggestions.addAll(items);
   }
-    
+
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder(255);
