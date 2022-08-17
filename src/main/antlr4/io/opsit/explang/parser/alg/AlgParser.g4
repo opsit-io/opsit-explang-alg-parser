@@ -4,7 +4,7 @@ grammar AlgParser;
     //boolean interpolated = false;
     int nestLevel = 0;
     //int iLevel = 0;
-    java.util.LinkedList iLevels = new java.util.LinkedList();
+    java.util.LinkedList<Integer> iLevels = new java.util.LinkedList<Integer>();
 }
 
 /*@header {

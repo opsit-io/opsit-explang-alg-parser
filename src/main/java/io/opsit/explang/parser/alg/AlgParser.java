@@ -14,11 +14,9 @@ import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_OPERATOR;
 import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_PARENTHESES;
 import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_SYMBOL;
 import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_WHITESPACE;
-import static io.opsit.explang.Utils.astnize;
 
 import com.vmware.antlr4c3.CodeCompletionCore;
 import com.vmware.antlr4c3.CodeCompletionCore.CandidatesCollection;
-// import org.antlr.v4.runtime.ANTLRInputStream;
 import io.opsit.explang.ASTN;
 import io.opsit.explang.ASTNLeaf;
 import io.opsit.explang.ASTNList;
@@ -359,7 +357,7 @@ public class AlgParser implements IParser, IAutoSuggester {
     // final String sym = unquote(AlgParserParser.VOCABULARY.getSymbolicName(tokType));
     // final String dsp = unquote(AlgParserParser.VOCABULARY.getDisplayName(tokType));
     if (null == lit) {
-      lit = OPERATOR_TOKEN_TYPES.get(tokType);
+      lit = operatorTokenTypes.get(tokType);
     }
     final ICode code = ctx.getCompiler().getFun(lit);
     String descr =
@@ -381,7 +379,7 @@ public class AlgParser implements IParser, IAutoSuggester {
     if (AlgParserParser.SYMBOL == tokType /*||
                                             AlgParserParser.KEYWORD == tokType*/) {
       return TOKKIND_SYMBOL;
-    } else if (OPERATOR_TOKEN_TYPES.containsKey(tokType)) {
+    } else if (operatorTokenTypes.containsKey(tokType)) {
       return TOKKIND_OPERATOR;
     } else if (AlgParserParser.NUMBER == tokType) {
       return TOKKIND_NUMBER;
@@ -410,7 +408,7 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
     if (AlgParserParser.SYMBOL == tokType) {
       suggs = mkSymbolSuggestions(ctx);
-    } else if (OPERATOR_TOKEN_TYPES.containsKey(tokType)) {
+    } else if (operatorTokenTypes.containsKey(tokType)) {
       suggs = mkOperatorSuggestions(ctx, tokType);
     } else {
       suggs = list();
@@ -671,6 +669,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
     // lambda   : 'FUNCTION' SYMBOL? '(' exprList? ')' block 'END'
+
     @Override
     public Object visitLambda(AlgParserParser.LambdaContext ctx) {
       ParseCtx pctx = makePctx(ctx);
@@ -821,6 +820,7 @@ public class AlgParser implements IParser, IAutoSuggester {
 
       return result;
     }
+
     // exprList : expr (',' expr)*
     @Override
     public Object visitExprList(AlgParserParser.ExprListContext ctx) {
@@ -1241,7 +1241,7 @@ public class AlgParser implements IParser, IAutoSuggester {
     int line;
     int charPositionInLine;
     String msg;
-    RecognitionException e;
+    RecognitionException ex;
 
     public SyntaxError(
         Recognizer<?, ?> recognizer,
@@ -1249,13 +1249,13 @@ public class AlgParser implements IParser, IAutoSuggester {
         int line,
         int charPositionInLine,
         String msg,
-        RecognitionException e) {
+        RecognitionException ex) {
       this.recognizer = recognizer;
       this.line = line;
       this.charPositionInLine = charPositionInLine;
       this.offendingSymbol = offendingSymbol;
       this.msg = msg;
-      this.e = e;
+      this.ex = ex;
     }
 
     public String toString() {
@@ -1266,7 +1266,8 @@ public class AlgParser implements IParser, IAutoSuggester {
   public static class SyntaxErrorListener extends BaseErrorListener {
     private final List<SyntaxError> syntaxErrors = new ArrayList<>();
 
-    SyntaxErrorListener() {}
+    SyntaxErrorListener() {
+    }
 
     List<SyntaxError> getSyntaxErrors() {
       return syntaxErrors;
@@ -1311,7 +1312,7 @@ public class AlgParser implements IParser, IAutoSuggester {
           AlgParserParser.GASSIGN, "Global Variable Assign",
           AlgParserParser.LASSIGN, "Local Variable Assign");
 
-  private final Map<Integer, String> OPERATOR_TOKEN_TYPES =
+  private final Map<Integer, String> operatorTokenTypes =
       map(
           AlgParserParser.ADDOP, "+", // arithmetic
           AlgParserParser.DIVOP, "/",

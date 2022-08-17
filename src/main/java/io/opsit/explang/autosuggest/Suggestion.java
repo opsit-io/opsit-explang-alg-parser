@@ -17,6 +17,7 @@ public class Suggestion {
     this.suffix = suffix;
     this.properties = properties;
   }
+
   public Suggestion(String text,
                     String kind,
                     Map<String,String> properties) {
