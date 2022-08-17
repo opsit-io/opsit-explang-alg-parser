@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class SourceInfo {
+  /**
+   * Construct SourceInfo with source data.
+   */
   public SourceInfo(String rawString, int rawPos) {
     super();
     this.rawString = rawString;

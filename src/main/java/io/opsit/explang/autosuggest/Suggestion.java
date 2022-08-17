@@ -7,7 +7,10 @@ public class Suggestion {
   public String kind;
   public String suffix;
   public Map<String,String> properties;
-    
+
+  /**
+   * Construct suggestion for code completion.
+   */
   public Suggestion(String text,
                     String kind,
                     String suffix,
@@ -18,6 +21,9 @@ public class Suggestion {
     this.properties = properties;
   }
 
+  /**
+   * Construct suggestion for code completion.
+   */
   public Suggestion(String text,
                     String kind,
                     Map<String,String> properties) {
@@ -27,7 +33,7 @@ public class Suggestion {
     this.properties = properties;
   }
 
-    
+  @Override
   public String toString() {
     final StringBuilder buf = new StringBuilder();
     buf.append("(");

@@ -126,7 +126,7 @@ public class AlgParser implements IParser, IAutoSuggester {
     resultList.setMultiExpr(true);
     return resultList;
   }
-  
+
   public boolean supportREPLStream() {
     return false;
   }
@@ -190,6 +190,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     return tokenize(mkParsingState(inputStr), curPos);
   }
 
+  /**
+   * Return tokenization of expression including information on current token (with active cursor).
+   */
   public Tokenization tokenize(ParsingState state, int curPos) {
     final Integer tokIdx = computeTokenIndex(state.tree, state.tokenStream, curPos);
     final List<LanguageToken> languageTokens = list();
@@ -253,6 +256,7 @@ public class AlgParser implements IParser, IAutoSuggester {
     return results;
   }
 
+  /** Unquote quoted expression. */
   public String unquote(String str) {
     if (null == str) {
       return null;
@@ -260,6 +264,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     return str.replaceAll("^'+", "").replaceAll("'+$", "");
   }
 
+  /**
+   * Format function docstring for display.
+   */
   public String docstringSummary(String str) {
     if (null == str) {
       return null;
@@ -276,6 +283,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     return str.substring(0, idx).trim();
   }
 
+  /**
+   * Return type of callable object.
+   */
   public String codeType(ICode code) {
     StringBuilder buf = new StringBuilder(20);
     buf.append(code.isBuiltIn() ? "built-in " : "user ");
@@ -286,6 +296,9 @@ public class AlgParser implements IParser, IAutoSuggester {
 
   // FIXME: should not work on string,
   //        should be in the documentation code in Compiler
+  /**
+   * Convert argument description for suggestion display.
+   */
   public String convertArgsDescr(String args) {
     if (null == args) {
       return "";
@@ -300,6 +313,10 @@ public class AlgParser implements IParser, IAutoSuggester {
     return args;
   }
 
+
+  /**
+   * Return suggestions for function calls.
+   */
   public List<Suggestion> mkFunctionsSuggestions(Compiler.ICtx ctx) {
     final List<Suggestion> results = list();
     final Compiler compiler = ctx.getCompiler();
@@ -321,6 +338,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     return results;
   }
 
+  /**
+   * Convert Map of variable properties for display.
+   */
   public Map<String, String> convertVariableProps(Map<Object, Object> props) {
     Map<String, String> results = map();
     if (null != props) {
@@ -331,6 +351,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     return results;
   }
 
+  /**
+   * Make list of suggestions for a variable.
+   */
   public List<Suggestion> mkVariablesSuggestions(Compiler.ICtx ctx) {
     final List<Suggestion> results = list();
     Map<String, Object> matches = ctx.findMatches("");
@@ -341,6 +364,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     return results;
   }
 
+  /**
+   * Return list of suggestions for a symbol literal.
+   */
   public List<Suggestion> mkSymbolSuggestions(Compiler.ICtx ctx) {
     final List<Suggestion> results = list();
     // FIXME: allow matching according pefix
@@ -351,6 +377,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     return results;
   }
 
+  /**
+   * Return list of suggestions for operators.
+   */
   public List<Suggestion> mkOperatorSuggestions(Compiler.ICtx ctx, Integer tokType) {
     final List<Suggestion> results = list();
     String lit = unquote(AlgParserParser.VOCABULARY.getLiteralName(tokType));
@@ -375,6 +404,9 @@ public class AlgParser implements IParser, IAutoSuggester {
 
   // FIXME: it gets ugly and long, need global table or put this metadata into grammar somehow
   // FIXME: UI wise should distinguish between function calls, variables, :keywords
+  /**
+   * Return kind of token for the autosuggestion mechanism given ANTLR token type.
+   */
   public String getTokenKind(int tokType) {
     if (AlgParserParser.SYMBOL == tokType /*||
                                             AlgParserParser.KEYWORD == tokType*/) {
@@ -400,6 +432,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
   }
 
+  /**
+   * Build list of suggestions for a token.
+   */
   public List<Suggestion> mkSuggestionForToken(
       Integer tokType, List<Integer> tokens, Compiler.ICtx ctx, boolean filter, Tokenization tz) {
     List<Suggestion> suggs;
@@ -453,12 +488,22 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
   }
 
+  /**
+   * Check if token has given position.
+   *
+   * @param tok token
+   * @param pos position
+   * @param rightInclude include token that start at the cursor position.
+   */
   public Token tokHasPos(Token tok, int pos, boolean rightInclude) {
     final int start = tok.getCharPositionInLine();
     final int stop = tok.getCharPositionInLine() + tok.getText().length();
     return (pos >= start && ((pos < stop) || (rightInclude && pos <= stop))) ? tok : null;
   }
 
+  /**
+   * Return token that has given cursor position.
+   */
   public Token tokenHasPos(List<Token> tl, int pos) {
     if (null != tl) {
       for (Token t : tl) {
@@ -470,6 +515,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     return null;
   }
 
+  /**
+   * Compute index of current token for given cursor position.
+   */
   public Integer computeTokenIndex(ParseTree tree, CommonTokenStream ts, int pos) {
     Integer result = null;
     if (tree instanceof TerminalNode) {
@@ -582,20 +630,20 @@ public class AlgParser implements IParser, IAutoSuggester {
     // }
 
     /*private ASTN ASTNize(Object param, ParseCtx ctx) {
-      if (param instanceof List) {
-        // ;ASTN lst = new ASTN
-        List<ASTN> astnList = new ArrayList<ASTN>(((List) param).size());
-        for (Object obj : (List) param) {
-          final ASTN node = ASTNize(obj, ctx);
-          astnList.add(node);
-        }
-        return new ASTNList(astnList, ctx);
-      } else if (param instanceof ASTN) {
-        return (ASTN) param;
-      } else {
-        return new ASTNLeaf(param, ctx);
+    if (param instanceof List) {
+      // ;ASTN lst = new ASTN
+      List<ASTN> astnList = new ArrayList<ASTN>(((List) param).size());
+      for (Object obj : (List) param) {
+        final ASTN node = ASTNize(obj, ctx);
+        astnList.add(node);
       }
-      }*/
+      return new ASTNList(astnList, ctx);
+    } else if (param instanceof ASTN) {
+      return (ASTN) param;
+    } else {
+      return new ASTNLeaf(param, ctx);
+    }
+    }*/
     // expr (as var)? (| expr )+
     // it works somewhat non-trivially:
     // the operator is right-associative, so originally
@@ -709,6 +757,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
+    /** Parse and transpile dictionary definition (JSON like syntax { x : y, ...}). */
     @Override
     public Object visitDict_expr(AlgParserParser.Dict_exprContext ctx) {
       final ParseCtx pctx = makePctx(ctx);
@@ -721,6 +770,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
+    /** Parse and transpile quoted expression (:expr). */
     @Override
     public Object visitQuote_expr(AlgParserParser.Quote_exprContext ctx) {
       final ParseCtx pctx = makePctx(ctx);
@@ -729,6 +779,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
+    /** Parse and transpile static association lookup expression (.). */
     @Override
     public Object visitDotchain(AlgParserParser.DotchainContext ctx) {
       final int childNum = ctx.getChildCount();
@@ -744,7 +795,8 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
-    public void parseLookup(List out, List<AlgParserParser.VectorContext> vectors, int i) {
+    /** Parse and transpile association lookup expression [key]. */
+    private void parseLookup(List out, List<AlgParserParser.VectorContext> vectors, int i) {
       if (i >= vectors.size()) {
         return;
       }
@@ -1167,7 +1219,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
   }
 
+  /** Make new Parse context on basis of ANTLR parsing information. */
   public ParseCtx makePctx(ParserRuleContext rctx) {
+    // FIXME: really map th information
     final ParseCtx pctx =
         new ParseCtx(
             rctx.getText(), /* line*/ -1, /* pos */ -1, /* offset */ 0, rctx.getText().length());
@@ -1204,6 +1258,7 @@ public class AlgParser implements IParser, IAutoSuggester {
         new SymbolParser()
       };
 
+  /** Convert S-exp string representaion in informational/error messages. */
   public String sexpToString(Object obj) {
     if (null == obj) {
       return "()";
@@ -1243,6 +1298,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     String msg;
     RecognitionException ex;
 
+    /**
+     *Create infomration record for syntax error.
+     */
     public SyntaxError(
         Recognizer<?, ?> recognizer,
         Object offendingSymbol,

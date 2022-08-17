@@ -11,6 +11,9 @@ public class Tokenization {
   // index in list of tokens
   public Integer tokenIndex;
 
+  /**
+   * Build string representation fit for debug output.
+   */
   public String toString() {
     StringBuilder buf = new StringBuilder(32);
     buf.append("Tokenization(");
@@ -22,12 +25,18 @@ public class Tokenization {
     return buf.toString();
   }
 
+  /**
+   * Construct empty structure.
+   */
   public Tokenization() {
     this.tokens = new ArrayList<LanguageToken>();
     this.token = "";
     this.tokenPos = 0;
   }
 
+  /**
+   * Construct Tokenization structure for parsed tokens.
+   */
   public Tokenization(List<LanguageToken> tokens, Integer tokenIndex, String token, int tokenPos) {
     this.tokens = tokens;
     this.tokenIndex = tokenIndex;

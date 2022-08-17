@@ -19,12 +19,18 @@ public class LanguageToken {
   public static final String TOKKIND_WHITESPACE = "whitespace";
   public static final String TOKKIND_KEYWORDS = "keywords";
 
+  /**
+   * Construct token.
+   */
   public LanguageToken(String text, String type, int startPos) {
     this.text = text;
     this.type = type;
     this.startPos = startPos;
   }
 
+  /**
+   * Return string representation of parsed token.
+   */
   public String toString() {
     return "LanguageToken("
         + "text='"
