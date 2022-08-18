@@ -5,7 +5,7 @@
   <version>0.0.2-SNAPSHOT</version>
 
   <name>Opsit Explang Algebraic Syntax Parser</name>
-  <description>Algebraic Syntax Parser for Explang: an extensible dynamic language for the Java platform</description>
+  <description>Algebraic Syntax Parser for Explang</description>
   <url>https://github.com/opsit-io/opsit-explang-alg-parser</url>
 
   <licenses>
@@ -148,7 +148,7 @@
               <shadedClassifierName>runnable</shadedClassifierName>
               <filters>
                 <filter>
-                  <artifact>io.opsit:opsit-explang-core</artifact>
+                  <artifact>*:*</artifact>
                   <excludes>
                     <exclude>META-INF/MANIFEST.MF</exclude>
                   </excludes>
@@ -173,6 +173,12 @@
           <archive>
             <index>true</index>
           </archive>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>io.opsit.explang.parser.alg.REPL</mainClass>
+            </manifest>
+          </archive>          
         </configuration>
       </plugin>
       <plugin>
@@ -237,19 +243,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maaven-jar-plugin</artifactId>
-        <version>3.2.0</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <mainClass>io.opsit.explang.REPL</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
       </plugin>
     </plugins>
   </build>
