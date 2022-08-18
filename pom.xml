@@ -4,9 +4,9 @@
   <artifactId>opsit-explang-alg-parser</artifactId>
   <version>0.0.2-SNAPSHOT</version>
 
-  <name>Opsit Explang Core</name>
-  <description>Explang - an extensible dynamic language for the Java platform: Core Module</description>
-  <url>https://github.com/opsit-io/opsit-explang-core</url>
+  <name>Opsit Explang Algebraic Syntax Parser</name>
+  <description>Algebraic Syntax Parser for Explang: an extensible dynamic language for the Java platform</description>
+  <url>https://github.com/opsit-io/opsit-explang-alg-parser</url>
 
   <licenses>
     <license>
@@ -26,9 +26,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:opsit-io/opsit-explang-core.git</connection>
-    <developerConnection>scm:git:ssh@github.com:opsit-io/opsit-explang-core.git</developerConnection>
-    <url>https://github.com/opsit-io/opsit-explang-core</url>
+    <connection>scm:git:git@github.com:opsit-io/opsit-explang-alg-parser.git</connection>
+    <developerConnection>scm:git:ssh@github.com:opsit-io/opsit-explang-alg-parser.git</developerConnection>
+    <url>https://github.com/opsit-io/opsit-explang-alg-parser</url>
   </scm>
 
   <properties>
@@ -148,7 +148,7 @@
               <shadedClassifierName>runnable</shadedClassifierName>
               <filters>
                 <filter>
-                  <artifact>io.opsit:opsit-version-type</artifact>
+                  <artifact>io.opsit:opsit-explang-core</artifact>
                   <excludes>
                     <exclude>META-INF/MANIFEST.MF</exclude>
                   </excludes>
