@@ -20,6 +20,7 @@ expr    :   beblock                                         # beblock_expr
     |       expr ( '.' SYMBOL )+                            # dotchain
     |       expr ( vector )+                                # assoc_lookup
     |       lambda                                          # lambda_expr
+    |       '('  exprList?  ')' '->' expr                   # slambda_expr
     |       fsymbol '('  exprList?  ')'                     # funcall_expr
     |       LP expr RP                                      # paren_expr
     |       op=( SUBOP | ADDOP ) expr                       # sign_expr

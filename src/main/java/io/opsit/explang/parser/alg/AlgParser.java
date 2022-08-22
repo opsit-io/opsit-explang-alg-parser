@@ -729,6 +729,25 @@ public class AlgParser implements IParser, IAutoSuggester {
 
       return result;
     }
+
+    // short lambda notation
+    //  '('  exprList?  ')' '->' expr 
+    @Override
+    public Object visitSlambda_expr(AlgParserParser.Slambda_exprContext ctx) {
+      ParseCtx pctx = makePctx(ctx);
+      AlgParserParser.ExprListContext exprList = ctx.exprList();
+      ASTN arglist = null == exprList ? null : (ASTN) visit(exprList);
+      ASTN expr = (ASTN) visit(ctx.expr());
+      ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("LAMBDA"), pctx)),
+                                     makePctx(ctx));
+      if (null != arglist) {
+        result.add(arglist);
+      } else {
+        result.add(new ASTNList(list(), makePctx(ctx)));
+      }
+      result.add(expr);
+      return result;
+    }
     
     // lambda   : 'FUNCTION' SYMBOL? '(' exprList? ')' block 'END'
     @Override
