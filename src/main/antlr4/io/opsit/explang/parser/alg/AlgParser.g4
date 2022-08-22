@@ -15,7 +15,7 @@ grammar AlgParser;
 // power (higher precision)
 
 expr    :   beblock                                         # beblock_expr
-    |  'if' expr block ('elseif' expr block)*  ( 'else' block )? EB #if_expr
+    |  IF expr block (ELSEIF expr block)*  ( ELSE block )? EB #if_expr
     |       expr ( '.' SYMBOL )+                            # dotchain
     |       expr ( vector )+                                # assoc_lookup
     |       lambda                                          # lambda_expr
@@ -71,6 +71,9 @@ STRING   : '"'ESCSTR'"' ;
 WS       : [ \t\r\n]+ -> channel(HIDDEN);
 /* FIXME: allow UNICODE letters */
 
+IF       : [iI][fF];
+ELSE     : [eE][lL][sS][eE];
+ELSEIF     : [eE][lL][sS][eE][iI][fF];
 SEARCHOP : [sS][eE][aA][rR][cC][hH];
 ASOP     : [aA][sS];
 FIELDSOP : [fF][iI][eE][lL][dD][sS];
