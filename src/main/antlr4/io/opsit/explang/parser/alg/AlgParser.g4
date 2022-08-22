@@ -16,6 +16,7 @@ grammar AlgParser;
 
 expr    :   beblock                                         # beblock_expr
     |  IF expr block (ELSEIF expr block)*  ( ELSE block )? EB #if_expr
+    |  WHILE expr block EB                                  # while_expr
     |       expr ( '.' SYMBOL )+                            # dotchain
     |       expr ( vector )+                                # assoc_lookup
     |       lambda                                          # lambda_expr
@@ -74,6 +75,7 @@ WS       : [ \t\r\n]+ -> channel(HIDDEN);
 IF       : [iI][fF];
 ELSE     : [eE][lL][sS][eE];
 ELSEIF     : [eE][lL][sS][eE][iI][fF];
+WHILE    : [wW][hH][iI][lL][eE];
 SEARCHOP : [sS][eE][aA][rR][cC][hH];
 ASOP     : [aA][sS];
 FIELDSOP : [fF][iI][eE][lL][dD][sS];

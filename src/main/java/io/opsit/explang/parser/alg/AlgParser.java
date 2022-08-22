@@ -716,8 +716,21 @@ public class AlgParser implements IParser, IAutoSuggester {
       }
       return result;
     }
-    // lambda   : 'FUNCTION' SYMBOL? '(' exprList? ')' block 'END'
 
+    @Override
+    public Object visitWhile_expr(AlgParserParser.While_exprContext ctx) {
+      final ParseCtx pctx = makePctx(ctx);
+      final ASTN expr = (ASTN)visit(ctx.expr());
+      final ASTNList blocks = new ASTNList(list(new ASTNLeaf(symbol("PROGN"), pctx)), pctx);
+      blocks.addAll((ASTNList)visit(ctx.block()));
+      final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("WHILE"), pctx),
+                                                expr,
+                                                blocks), pctx);
+
+      return result;
+    }
+    
+    // lambda   : 'FUNCTION' SYMBOL? '(' exprList? ')' block 'END'
     @Override
     public Object visitLambda(AlgParserParser.LambdaContext ctx) {
       ParseCtx pctx = makePctx(ctx);
