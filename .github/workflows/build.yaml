@@ -1,0 +1,44 @@
+name: Build and publish jars
+
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: dev
+    defaults:
+      run:
+        working-directory: ./
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+
+      - name: Setup java and maven central
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          server-id: ossrh
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_TOKEN
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          
+      - name: Build and deploy with maven
+        run: mvn --batch-mode -P publish clean install
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          
+
+        
+
+      

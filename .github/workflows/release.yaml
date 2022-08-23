@@ -1,0 +1,61 @@
+name: Make release 
+
+on:
+  release:
+    types: [ published ]
+
+# FIXME:
+#    tags:
+#      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup java and maven central
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          server-id: ossrh
+          server-username: OSSRH_USERNAME
+          server-password: OSSRH_TOKEN
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          
+      - name: Build and deploy with maven
+        run: mvn --batch-mode -P publish clean deploy
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Release
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: target/*.jar target/*.asc target/*.pom
+          
+      # This one cannot work on already existing release (release.* events)
+      # 
+      # - name: Release
+      #   uses: docker://antonyurchenko/git-release:latest
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     ALLOW_EMPTY_CHANGELOG: true
+      #   with:
+      #     args: target/*.jar target/*.asc target/*.pom
+
+
+        
+
+      
