@@ -2,27 +2,24 @@
 
 function swap(a, i, j) 
     "swap two elements in an indexable sequence";
-    tmp:= get(a, i);
-    aset(a, i, get(a,j));
+    tmp:= a[i];
+    aset(a, i, a[j]);
     aset(a, j, tmp);
 end;
 
 
 function random_list(size, maxr)
     "make list of length size of random number from 0 upto maxr";
-    map( function (x)
-            random(maxr);
-         end,
-         range(0, size));
+    map( x -> random(maxr), range(0, size));
 end;
 
 function partition(a, lo, hi)
     "partition part of an indexable sequence a";
-    pivot := get(a, hi);
+    pivot := a[hi];
     i := lo;
     j := lo;
     while j < hi
-        if (get(a, j) < pivot) 
+        if a[j] < pivot 
             swap(a, i, j);
             i := i + 1;
         end;
@@ -42,18 +39,22 @@ function quick_sort (a, lo, hi)
     a;
 end;
 
-samples := list( random_list(32, 100), # list of random integers
-                 append(make_array(0), random_list(32,100)),
-                 append(list(), "pack my box with five dozen liquor jugs"),
-                 list(v"0.1.2",  v"0.1.2-pre1", v"0.1.2-pre2", v"0.1.3", v"0.1.2-pre1+10", v"1.2.3"));
-map( function(data)
+# create list of lists/arrays/character sequences to be sorted
+samples := [
+    ## list of random integers
+    random_list(32, 100), 
+    ## Array of objects
+    append(make_array(0), random_list(32,100)),                
+    ## list of Characters
+    append(list(), "pack my box with five dozen liquor jugs"), 
+    ## list of versions
+    [v"0.1.2",  v"0.1.2-pre1", v"0.1.2-pre2", v"0.1.3", v"0.1.2-pre1+10", v"1.2.3"] 
+];
+map( data -> begin
         print(str("Using quick sort on:  ", type_of(data), "\n"));	
         print(str("input=", data, "\n"));
         quick_sort(data, 0, length(data) - 1);
         print(str("output=",data, "\n\n"));
-     end, samples);
+     end,
+     samples);
            
-                 
-
-
-

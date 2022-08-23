@@ -730,6 +730,18 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
+    // short lambda notation with one argument
+    // symbol '->' expr 
+    @Override
+    public Object visitMonolambda_expr(AlgParserParser.Monolambda_exprContext ctx) {
+      final ParseCtx pctx = makePctx(ctx);
+      final String argname = ctx.SYMBOL().getText();
+      final ASTN expr = (ASTN) visit(ctx.expr());
+      final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("LAMBDA"), pctx),
+          new ASTNList(list(new ASTNLeaf(symbol(argname), pctx)), pctx), expr), makePctx(ctx));
+      return result;
+    }
+
     // short lambda notation
     //  '('  exprList?  ')' '->' expr 
     @Override
