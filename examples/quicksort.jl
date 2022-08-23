@@ -50,11 +50,11 @@ samples := [
     ## list of versions
     [v"0.1.2",  v"0.1.2-pre1", v"0.1.2-pre2", v"0.1.3", v"0.1.2-pre1+10", v"1.2.3"] 
 ];
-map( data -> begin
-        print(str("Using quick sort on:  ", type_of(data), "\n"));	
-        print(str("input=", data, "\n"));
-        quick_sort(data, 0, length(data) - 1);
-        print(str("output=",data, "\n\n"));
-     end,
-     samples);
+foreach([data, samples],
+        begin
+            print(i"Using quick sort on:  $(type_of(data))\n");	
+            print(i"input=$(data)\n");
+            quick_sort(data, 0, length(data) - 1);
+            print(i"output=$(data)\n\n");
+        end);
            
