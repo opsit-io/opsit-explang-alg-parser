@@ -38,11 +38,11 @@ Code Examples
 Installation
 ------------
 
-Download an Explang Core executable JAR jars from Github 
+Download executable JAR jars from Github 
 [releases](https://github.com/opsit-io/opsit-explang-alg-parser/releases)
 
 
-Or use maven CLI to fetch the artifacts from maven central:
+Or use maven CLI to fetch the artifact from maven central:
 
 ```
 mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -Dartifact=io.opsit:opsit-explang-alg-parser:0.0.2:jar:runnable   -Dtransitive=false -Ddest=opsit-explang-alg-parser-0.0.2-runnable.jar
@@ -84,8 +84,8 @@ $ java -jar opsit-explang-alg-parser-0.0.2-runnable.jar ./examples/hello.jl
 Hello world
 ```
 
-Quick Start Guide to Using Explang from Java Code
---------------------------------------------------
+Quick Start Guide to Using Explang with Alg Parser from Java Code
+-----------------------------------------------------------------
 
 ### Add to the dependencies listin *pom.xml*
 
