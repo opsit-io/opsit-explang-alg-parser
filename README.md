@@ -54,7 +54,7 @@ Using REPL
 Explang-core contains built-in REPL. 
 
 ```
-$ java -jar opsit-explang-alg-parser-0.0.2-SNAPSHOT-runnable.jar
+$ java -jar opsit-explang-alg-parser-0.0.2-runnable.jar
 Welcome to the EXPLANG REPL!
 Active parser is AlgParser
 Loaded packages are: [base.math, base.text, io, base.bindings, ffi, base.funcs, loops, threads, base.version, base.coercion, base.logic, base.lang, base.arithmetics, base.seq, base.control, base.regex, dwim, base.docs, base.beans, base.types]
