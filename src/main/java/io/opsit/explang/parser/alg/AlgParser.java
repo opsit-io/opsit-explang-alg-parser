@@ -20,6 +20,7 @@ import com.vmware.antlr4c3.CodeCompletionCore.CandidatesCollection;
 import io.opsit.explang.ASTN;
 import io.opsit.explang.ASTNLeaf;
 import io.opsit.explang.ASTNList;
+import io.opsit.explang.ArgSpec;
 import io.opsit.explang.Compiler;
 import io.opsit.explang.ICode;
 import io.opsit.explang.IParser;
@@ -1391,6 +1392,28 @@ public class AlgParser implements IParser, IAutoSuggester {
     public String toString() {
       return Utils.join(syntaxErrors.iterator(), "\n");
     }
+  }
+
+  @Override
+  public String formatArgSpec(List<String> spec) {
+    StringBuilder buf = new StringBuilder(64);
+    if (null != spec) {
+      boolean isPrefix = false;
+      for (int idx = 0; idx < spec.size(); idx++) {
+        String str = spec.get(idx);
+        if (idx > 0) {
+          if (!isPrefix) {
+            buf.append(",");
+          }
+          buf.append(" ");
+        }
+        buf.append(str);
+        isPrefix = str.startsWith("&");
+      }
+    } else {
+      buf.append(ArgSpec.ARG_REST).append("args");
+    }
+    return buf.toString();
   }
 
   // FIXME: use rule labels somehow?
