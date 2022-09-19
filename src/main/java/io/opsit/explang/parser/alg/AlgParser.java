@@ -788,6 +788,20 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
+
+    @Override
+    public Object visitReturn_expr(AlgParserParser.Return_exprContext ctx) {
+      final ParseCtx pctx = makePctx(ctx);
+      ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("RETURN"), pctx)), pctx);
+      // AlgParserParser.ExprListContext exprList =  ctx.exprList();
+      AlgParserParser.ExprContext expr = ctx.expr();
+      if (null != expr) {
+        ASTN arg = (ASTN) visit(expr);
+        result.add(arg);
+      }
+      return result;
+    }
+
     @Override
     public Object visitVector_expr(AlgParserParser.Vector_exprContext ctx) {
       final ParseCtx pctx = makePctx(ctx);

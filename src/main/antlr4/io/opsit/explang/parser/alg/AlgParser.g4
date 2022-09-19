@@ -17,6 +17,7 @@ grammar AlgParser;
 expr    :   beblock                                         # beblock_expr
     |  IF expr block (ELSEIF expr block)*  ( ELSE block )? EB #if_expr
     |  WHILE expr block EB                                  # while_expr
+    |  RETURN expr                                          # return_expr
     |       expr ( '.' SYMBOL )+                            # dotchain
     |       expr ( vector )+                                # assoc_lookup
     |       lambda                                          # lambda_expr
@@ -74,6 +75,7 @@ STRING   : '"'ESCSTR'"' ;
 WS       : [ \t\r\n]+ -> channel(HIDDEN);
 /* FIXME: allow UNICODE letters */
 
+RETURN   : [rR][eE][tT][uU][rR][nN];
 IF       : [iI][fF];
 ELSE     : [eE][lL][sS][eE];
 ELSEIF     : [eE][lL][sS][eE][iI][fF];
