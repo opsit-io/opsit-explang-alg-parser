@@ -5,11 +5,11 @@ function  freqcount(seq)
     ## create map of counters
     m := hashmap();
     ## for each  word in text that matches pattern
-    foreach ([word, seq],
-             assoc!(m, word, m[word] + 1));
+    for  word in  seq
+        assoc!(m, word, m[word] + 1);
+    end;
     ## sort list of Map Entries by their values
-    sort( (a, b) -> b.value - a.value,
-          append(list(), m));
+    sort((a, b) -> b.value - a.value,  append(list(), m));
 end;
 
 txt:= "If in this heart a hope be dear,
@@ -31,7 +31,7 @@ $(charfreq)\n\n");
 
 
 ## make array of random integers
-numbers := map( x -> random(100), make_array(10));
+numbers := map( x -> random(10), make_array(0,0,0,0,0,0,0,0,0,0,0,0));
 numbersfreq := freqcount( numbers );
 print (i"Frequency table for array of numbers
         $(numbers)
