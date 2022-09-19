@@ -41,7 +41,7 @@ end;
 # # position: list of integers that represent queen position in a row
 add_queen([], 0);
 
-println("Found ", length(solutions), " solutions");
+println(i"Found $(length(solutions)) solutions");
 println("First solution:");
 print_solution(first(solutions));
 
