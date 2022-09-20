@@ -6,10 +6,10 @@ function  freqcount(seq)
     m := hashmap();
     ## for each  word in text that matches pattern
     for  word in  seq
-        assoc!(m, word, m[word] + 1);
+        m[word] := m[word] + 1;
     end;
     ## sort list of Map Entries by their values
-    sort((a, b) -> b.value - a.value,  append(list(), m));
+    sort((a, b) -> b.value - a.value,  append([], m));
 end;
 
 txt:= "If in this heart a hope be dear,
@@ -17,7 +17,7 @@ txt:= "If in this heart a hope be dear,
        If in these eyes there lurk a tear,
        ⁠'Twill flow, and cease to burn my brain";
 
-wordlist := map(f"lowercase", append(list(), re_seq(r"\w+", txt)));
+wordlist := map(f"lowercase", append([], re_seq(r"\w+", txt)));
 wordfreq := freqcount(wordlist);
 
 print(i"Word frequency table for text

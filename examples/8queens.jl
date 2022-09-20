@@ -32,7 +32,7 @@ function add_queen(a, n)
    else
        for c in range(0,N)    # try to place next queen
 	       if (check_placement(a, n, c))
-		       put!(a, n, c);
+		       a[n] := c;
 		       add_queen(a, n + 1);
            end;
        end;
