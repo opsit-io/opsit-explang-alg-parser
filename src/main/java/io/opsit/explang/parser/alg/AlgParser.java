@@ -973,18 +973,29 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
-    // SYMBOL op=( GASSIGN | LASSIGN) expr
+    // expr LASSIGN expr
     @Override
     public Object visitAssign_expr(AlgParserParser.Assign_exprContext ctx) {
       ParseCtx pctx = makePctx(ctx);
-      final ASTN var = new ASTNLeaf(symbol(ctx.getChild(0).getText()), pctx);
-      final ASTN val = (ASTN) visit(ctx.getChild(2));
-      final String symName = ctx.op.getType() == AlgParserParser.GASSIGN ? "SETQ" : "SETV";
-
-      ASTNList result = new ASTNList(list(new ASTNLeaf(symbol(symName), pctx), var, val), pctx);
+      //final ASTN var = new ASTNLeaf(symbol(ctx.getChild(0).getText()), pctx);
+      final ASTN var = (ASTN) visit(ctx.expr(0));
+      final ASTN val = (ASTN) visit(ctx.expr(1));
+      //final ASTN val = (ASTN) visit(ctx.getChild(2));
+      //final String symName = ctx.op.getType() == AlgParserParser.GASSIGN ? "SETQ" : "SETV";
+      final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("SETF"), pctx), var, val), pctx);
       return result;
     }
 
+    // SYMBOL GASSIGN expr
+    @Override
+    public Object visitGassign_expr(AlgParserParser.Gassign_exprContext ctx) {
+      ParseCtx pctx = makePctx(ctx);
+      final ASTN var = new ASTNLeaf(symbol(ctx.getChild(0).getText()), pctx);
+      final ASTN val = (ASTN) visit(ctx.getChild(2));
+      final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("SETQ"), pctx), var, val), pctx);
+      return result;
+    }
+    
     @Override
     public Object visitAtom_expr(AlgParserParser.Atom_exprContext ctx) {
       final String strVal = ctx.getText();

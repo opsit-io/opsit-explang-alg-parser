@@ -41,7 +41,8 @@ expr    :   beblock                                         # beblock_expr
     |<assoc=right>       expr  ASOP SYMBOL   '|'  expr      # th_as_expr
 
     |       expr '|'                                        # th_at_expr
-    |       SYMBOL op=( GASSIGN | LASSIGN) expr             # assign_expr
+    |       SYMBOL GASSIGN  expr                            # gassign_expr
+    |       expr   LASSIGN  expr                            # assign_expr
 //    |       SYMFUNC                                         # symfunc_expr
     |       (IPOL_START expr (IPOL_MIDDLE expr )* IPOL_END | IPOL_VOID) # ipol_expr
     |       ('{' '}' | '{' expr ':' expr (',' expr ':' expr )* '}')     # dict_expr
