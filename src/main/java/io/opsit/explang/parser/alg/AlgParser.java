@@ -24,6 +24,7 @@ import io.opsit.explang.ArgSpec;
 import io.opsit.explang.Compiler;
 import io.opsit.explang.ICode;
 import io.opsit.explang.IParser;
+import io.opsit.explang.Keyword;
 import io.opsit.explang.ParseCtx;
 import io.opsit.explang.ParserException;
 import io.opsit.explang.ParserExceptions;
@@ -1308,7 +1309,23 @@ public class AlgParser implements IParser, IAutoSuggester {
       ASTNList result = new ASTNList(list(callSym), pctx);
       if (hasExprList) {
         final ASTNList args = (ASTNList) visit(ctx.getChild(2));
-        result.addAll(args);
+        for (int i = 0; i < args.size(); i++) {
+          ASTN arg = args.get(i);
+          if (arg.isList()) {
+            final ASTNList argLst = (ASTNList)arg;
+            if (argLst.size() == 3
+                && !argLst.get(0).isList()
+                && symbol("SETF").equals(argLst.get(0).getObject())
+                && !argLst.get(1).isList()
+                && (argLst.get(1).getObject() instanceof Symbol)) {
+              result.add(new ASTNLeaf(new Keyword(":" + argLst.get(1).getObject()), argLst.get(1).getPctx()));
+              result.add(argLst.get(2));
+              continue;
+            }
+          }
+          result.add(arg);
+        }
+
       }
       return result;
     }

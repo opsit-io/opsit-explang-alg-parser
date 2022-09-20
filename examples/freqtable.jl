@@ -31,7 +31,7 @@ $(charfreq)\n\n");
 
 
 ## make array of random integers
-numbers := map( x -> random(10), make_array(0,0,0,0,0,0,0,0,0,0,0,0));
+numbers := map( x -> random(10), make_array(size:=20));
 numbersfreq := freqcount( numbers );
 print (i"Frequency table for array of numbers
         $(numbers)
