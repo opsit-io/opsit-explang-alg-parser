@@ -53,7 +53,7 @@ expr    :   beblock                                         # beblock_expr
     |       SYMBOL '->' expr                                # monolambda_expr                
     ; /* end of expr */
 
-lambda   : FUNC SYMBOL? '(' exprList? ELLIPSIS? ( ';' exprList? ELLIPSIS? )? ')' block EB ;
+lambda   : FUNC SYMBOL? '(' (posargs=exprList rest=ELLIPSIS? )? ( ';' kwargs=exprList okeys=ELLIPSIS? )? ')' block EB ;
 beblock  :  BB block EB                            ;
 replblock : block EOF                              ;
 

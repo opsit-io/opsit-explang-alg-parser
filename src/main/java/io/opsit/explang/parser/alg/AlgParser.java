@@ -763,48 +763,41 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
+    protected ASTN transArg(ASTN arg) {
+      ASTN result = null;
+      if (isSETF(arg)) {
+        final ASTNList argL = (ASTNList)arg;
+        if (argL.get(2).isList() || null != argL.get(2).getObject()) {
+          final ASTNList argWithInit = new ASTNList(list(argL.get(1)),argL.getPctx());
+          argWithInit.add(argL.get(2));
+          result = argWithInit;
+        } else {
+          result = argL.get(1);
+        }
+      } else {
+        result = arg;
+      }
+      return result;
+    }
+    
    
     
-    // lambda   : 'FUNCTION' SYMBOL? '(' exprList? ')' block 'END'
+    // lambda   : 'FUNCTION' SYMBOL? '(' exprList? ... ( ';' exprList? ... )?  ')' block 'END'
+    //                                  ^args      ^rest     ^kw args  ^other keys
     @Override
     public Object visitLambda(AlgParserParser.LambdaContext ctx) {
       ParseCtx pctx = makePctx(ctx);
 
       final String symText = null == ctx.SYMBOL() ? null : ctx.SYMBOL().getText();
       final Symbol sym = symbol(symText);
-      AlgParserParser.ExprListContext exprList = ctx.exprList(0);
-      ASTNList arglist = null == exprList ? null : (ASTNList) visit(exprList);
+
+      // regular args
+      ASTNList posArgs = null == ctx.posargs ? null : (ASTNList) visit(ctx.posargs);
       
-      ASTNList trArgList = new ASTNList(list(),
-                                    null == arglist ? makePctx(ctx) : arglist.getPctx());
-      boolean isOptional = false;
-      if (null != arglist) {
-        for (int i = 0; i < arglist.size(); i++) {
-          ASTN arg = arglist.get(i);
-          if (isSETF(arg)) {
-            if (!isOptional) {
-              trArgList.add(new ASTNLeaf(new Symbol("&OPTIONAL"), arg.getPctx()));
-              isOptional = true;
-            }
-            final ASTNList argL = (ASTNList)arg;
-            if (argL.get(2).isList() || null != argL.get(2).getObject()) {
-              ASTNList argWithInit = new ASTNList(list(argL.get(1)),argL.getPctx());
-              argWithInit.add(argL.get(2));
-              trArgList.add(argWithInit);
-            } else {
-              trArgList.add(argL.get(1));
-            }
-            
-            
-          } else {
-            trArgList.add(arg);
-          }
-          
-        }
-      }
-      
-      ASTNList block = (ASTNList) visit(ctx.block());
+      boolean hasRest = null != ctx.rest ;
+      boolean hasKWRest = null != ctx.okeys ;
       ASTNList result = new ASTNList(list(), makePctx(ctx));
+
       if (null != sym) {
         result.add(new ASTNLeaf(symbol("DEFUN"), pctx));
         result.add(new ASTNLeaf(sym, pctx));
@@ -812,8 +805,46 @@ public class AlgParser implements IParser, IAutoSuggester {
         result.add(new ASTNLeaf(symbol("LAMBDA"), pctx));
       }
       
-      result.add(trArgList);
-      
+      if (hasRest && hasKWRest) {
+        throw new RuntimeException("Cannot have both regular and key-value varargs");
+      }
+      ASTNList trArgList = new ASTNList(list(),
+                                    null == posArgs ? makePctx(ctx) : posArgs.getPctx());
+      boolean isOptional = false;
+      if (null != posArgs) {
+        for (int i = 0; i < posArgs.size() - (hasRest ? 1 : 0); i++) {
+          ASTN arg = posArgs.get(i);
+          boolean isSETF = isSETF(arg);
+          if (isSETF && !isOptional) {
+              trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_OPTIONAL), arg.getPctx()));
+              isOptional = true;
+          }
+          trArgList.add(transArg(arg));
+        }
+      }
+      ASTNList kwargs  = null == ctx.kwargs ? null : (ASTNList) visit(ctx.kwargs);
+      if (null != kwargs) {
+        if (hasKWRest) { 
+          trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_REST), kwargs.getPctx()));
+        } 
+        trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_KEY), kwargs.getPctx()));
+        if (hasKWRest) {
+          trArgList.add(transArg(kwargs.get(kwargs.size()-1)));
+        }
+        for (int i = 0; i < kwargs.size() - (hasKWRest ? 1 : 0); i++) {
+          trArgList.add(transArg(kwargs.get(i)));
+        }
+        if (hasKWRest) {
+          trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_ALLOW_OTHER_KEYS), kwargs.getPctx()));
+        }
+      }
+      if (hasRest) {
+        ASTN arg = posArgs.get(posArgs.size() - 1);
+        trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_REST), arg.getPctx()));
+        trArgList.add(transArg(arg));
+      }
+      result.add(trArgList);      
+      ASTNList block = (ASTNList) visit(ctx.block());
       result.addAll(block);
       return result;
     }
