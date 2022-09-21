@@ -762,6 +762,8 @@ public class AlgParser implements IParser, IAutoSuggester {
       result.add(expr);
       return result;
     }
+
+   
     
     // lambda   : 'FUNCTION' SYMBOL? '(' exprList? ')' block 'END'
     @Override
@@ -770,8 +772,37 @@ public class AlgParser implements IParser, IAutoSuggester {
 
       final String symText = null == ctx.SYMBOL() ? null : ctx.SYMBOL().getText();
       final Symbol sym = symbol(symText);
-      AlgParserParser.ExprListContext exprList = ctx.exprList();
-      ASTN arglist = null == exprList ? null : (ASTN) visit(exprList);
+      AlgParserParser.ExprListContext exprList = ctx.exprList(0);
+      ASTNList arglist = null == exprList ? null : (ASTNList) visit(exprList);
+      
+      ASTNList trArgList = new ASTNList(list(),
+                                    null == arglist ? makePctx(ctx) : arglist.getPctx());
+      boolean isOptional = false;
+      if (null != arglist) {
+        for (int i = 0; i < arglist.size(); i++) {
+          ASTN arg = arglist.get(i);
+          if (isSETF(arg)) {
+            if (!isOptional) {
+              trArgList.add(new ASTNLeaf(new Symbol("&OPTIONAL"), arg.getPctx()));
+              isOptional = true;
+            }
+            final ASTNList argL = (ASTNList)arg;
+            if (argL.get(2).isList() || null != argL.get(2).getObject()) {
+              ASTNList argWithInit = new ASTNList(list(argL.get(1)),argL.getPctx());
+              argWithInit.add(argL.get(2));
+              trArgList.add(argWithInit);
+            } else {
+              trArgList.add(argL.get(1));
+            }
+            
+            
+          } else {
+            trArgList.add(arg);
+          }
+          
+        }
+      }
+      
       ASTNList block = (ASTNList) visit(ctx.block());
       ASTNList result = new ASTNList(list(), makePctx(ctx));
       if (null != sym) {
@@ -780,11 +811,9 @@ public class AlgParser implements IParser, IAutoSuggester {
       } else {
         result.add(new ASTNLeaf(symbol("LAMBDA"), pctx));
       }
-      if (null != arglist) {
-        result.add(arglist);
-      } else {
-        result.add(new ASTNList(list(), makePctx(ctx)));
-      }
+      
+      result.add(trArgList);
+      
       result.addAll(block);
       return result;
     }
@@ -1483,6 +1512,18 @@ public class AlgParser implements IParser, IAutoSuggester {
     return buf.toString();
   }
 
+  private static boolean isSETF(ASTN arg) {
+    if (arg.isList()) {
+      final ASTNList argLst = (ASTNList) arg;
+      if (argLst.size() == 3 && !argLst.get(0).isList()
+          && symbol("SETF").equals(argLst.get(0).getObject()) && !argLst.get(1).isList()
+          && (argLst.get(1).getObject() instanceof Symbol)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
   // FIXME: use rule labels somehow?
   private final Map<Integer, String> tokenDescrs =
       map(

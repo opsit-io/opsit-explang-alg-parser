@@ -53,7 +53,7 @@ expr    :   beblock                                         # beblock_expr
     |       SYMBOL '->' expr                                # monolambda_expr                
     ; /* end of expr */
 
-lambda   : FUNC SYMBOL? '(' exprList? ')' block EB ;
+lambda   : FUNC SYMBOL? '(' exprList? ELLIPSIS? ( ';' exprList? ELLIPSIS? )? ')' block EB ;
 beblock  :  BB block EB                            ;
 replblock : block EOF                              ;
 
@@ -68,6 +68,7 @@ atom     : ( NIL_LIT | NUMBER | TRUE_LIT | FALSE_LIT | fsymbol  | STRING | REGEX
 
 //funop    : ( MULOP | DIVOP | ADDOP | SUBOP | ANDOP | 
 /* lexer rules */
+
 REGEXP   : [rg]'"'ESCSTR'"'[dixmlsucU]*;
 SYMFUNC  : [f]'"'ESCSTR'"';
 VERSION  : [v]'"'ESCSTR'"';
@@ -125,7 +126,7 @@ GASSIGN  : '::=';
 
 DWIM_MATCHES : '=~' ;
 //DWIM_SEARCH : [sS][eE][aA][rR][cC][hH] ;
-
+ELLIPSIS : '...';
     
 LP : '('  { nestLevel++; } ;
 RP : ')'  { nestLevel--; } ;
