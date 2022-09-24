@@ -997,7 +997,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       final ASTN obj = (ASTN) visit(ctx.getChild(0));
       final ASTN pat = (ASTN) visit(ctx.getChild(2));
       ASTNList result =
-          new ASTNList(list(new ASTNLeaf(symbol("DWIM_SEARCH"), pctx), obj, pat), pctx);
+          new ASTNList(list(new ASTNLeaf(symbol("SEARCH"), pctx), obj, pat), pctx);
       return result;
     }
 
