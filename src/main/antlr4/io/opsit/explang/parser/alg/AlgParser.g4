@@ -23,6 +23,7 @@ expr    :   beblock                                         # beblock_expr
     |       expr ( vector )+                                # assoc_lookup
     |       lambda                                          # lambda_expr
     |       fsymbol '('  exprList?  ')'                     # funcall_expr
+    |       '(' lambda ')' '('  exprList?  ')'              # lambdacall_expr        
     |       LP expr RP                                      # paren_expr
     |       op=( SUBOP | ADDOP ) expr                       # sign_expr
     |       NOTOP                expr                       # not_expr

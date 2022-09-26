@@ -1368,8 +1368,13 @@ public class AlgParser implements IParser, IAutoSuggester {
       ASTN callSym = new ASTNLeaf(symbol(ctx.getChild(0).getText()), pctx);
       ASTNList result = new ASTNList(list(callSym), pctx);
       if (hasExprList) {
-        final ASTNList args = (ASTNList) visit(ctx.getChild(2));
-        for (int i = 0; i < args.size(); i++) {
+        convertArgList(result, (ASTNList) visit(ctx.getChild(2)));
+      }
+      return result;
+    }
+
+    protected void convertArgList(ASTNList result, ASTNList args) {
+      for (int i = 0; i < args.size(); i++) {
           ASTN arg = args.get(i);
           if (arg.isList()) {
             final ASTNList argLst = (ASTNList)arg;
@@ -1385,7 +1390,27 @@ public class AlgParser implements IParser, IAutoSuggester {
           }
           result.add(arg);
         }
+    }
 
+    
+    // '(' lambda ')' '('  exprList?  ')'
+    @Override
+    public Object visitLambdacall_expr(AlgParserParser.Lambdacall_exprContext ctx) {
+      final ParseCtx pctx = makePctx(ctx);
+      int numKids = ctx.getChildCount();
+      boolean hasExprList;
+      if (numKids == 5) {
+        hasExprList = false;
+      } else if (numKids == 6) {
+        hasExprList = true;
+      } else {
+        throw new RuntimeException(
+            "Internal error: invalid numner of tokens when translating funcall");
+      }
+      ASTN lambda =  (ASTN)visit(ctx.getChild(1));
+      ASTNList result = new ASTNList(list(lambda), pctx);
+      if (hasExprList) {
+        convertArgList(result, (ASTNList) visit(ctx.getChild(4)));
       }
       return result;
     }
