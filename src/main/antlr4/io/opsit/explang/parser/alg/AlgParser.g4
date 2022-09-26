@@ -141,6 +141,7 @@ fragment ESCSTR: (ESC|.)*?;
 
 fragment ESC:'\\'[btnr"\\]     ;
 
-LINE_COMMENT: '#' .*? '\n' ->channel(HIDDEN);
 BLOCK_COMMENT: '#=' .*? '=#' -> channel(HIDDEN);
+LINE_COMMENT: '#'~[=].*?'\n' ->channel(HIDDEN);
+
 
