@@ -1056,6 +1056,46 @@ public class AlgParser implements IParser, IAutoSuggester {
       final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("SETQ"), pctx), var, val), pctx);
       return result;
     }
+
+
+    @Override
+    public Object visitChar_expr(AlgParserParser.Char_exprContext ctx) {
+      final ParseCtx pctx = makePctx(ctx);
+      final String strVal = ctx.getText();
+      char c = strVal.charAt(1);
+      if (c == '\\') {
+        c = strVal.charAt(2);
+        switch (c) {
+          case 'b':
+            c = '\b';
+            break;
+          case 't':
+            c = '\t';
+            break;
+          case 'n':
+            c = '\n';
+            break;
+          case 'f':
+            c = '\f';
+            break;
+          case 'r':
+            c = '\r';
+            break;
+          case 'u':
+          case 'U':
+          if (strVal.length() > 4) {
+            final int i = Integer.parseInt(strVal.substring(3, strVal.length()-1), 16);
+            c = (char) i;
+          }
+          break;
+          default:
+            break;
+        }
+      }
+      final ASTN astn = new ASTNLeaf(c, pctx);
+      return astn;
+    }
+
     
     @Override
     public Object visitAtom_expr(AlgParserParser.Atom_exprContext ctx) {

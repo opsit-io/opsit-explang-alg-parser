@@ -49,6 +49,7 @@ expr    :   beblock                                         # beblock_expr
     |       ('{' '}' | '{' expr ':' expr (',' expr ':' expr )* '}')     # dict_expr
     |       vector                                          # vector_expr
     |       ':' expr                                        # quote_expr
+    |       CHAR                                            # char_expr
     |       atom                                            # atom_expr
     |       '('  exprList?  ')' '->' expr                   # slambda_expr
     |       SYMBOL '->' expr                                # monolambda_expr                
@@ -74,7 +75,8 @@ REGEXP   : [rg]'"'ESCSTR'"'[dixmlsucU]*;
 SYMFUNC  : [f]'"'ESCSTR'"';
 VERSION  : [v]'"'ESCSTR'"';
 
-    
+CHAR     : '\'' ('\\'. | '\\'[uU] HD HD? HD? HD? |~('\'') ) '\'' ;
+
 STRING   : '"'ESCSTR'"' ;
 WS       : [ \t\r\n]+ -> channel(HIDDEN);
 /* FIXME: allow UNICODE letters */
@@ -106,6 +108,7 @@ SYMBOL   : [A-Za-z_][A-Za-z_0-9!]*;
 //KEYWORD  : [:][A-Za-z_0-9]+;
 NUMBER   : DIGIT+(DOT DIGIT+)?([eE][-]?DIGIT+)?[fFlLbBsSdDiI]? ; 
 DIGIT    : [0-9];
+HD       : [0-9A-Fa-f];
 DOT      : '.' ;   
 
 ISSAME   : '==='; 
