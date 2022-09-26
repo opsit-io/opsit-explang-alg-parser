@@ -104,7 +104,7 @@ NOTOP    : [nN][oO][tT];
 
 SYMBOL   : [A-Za-z_][A-Za-z_0-9!]*;
 //KEYWORD  : [:][A-Za-z_0-9]+;
-NUMBER   : DIGIT+(DOT DIGIT+)?[fFlLbBsSdDiI]? ; 
+NUMBER   : DIGIT+(DOT DIGIT+)?([eE][-]?DIGIT+)?[fFlLbBsSdDiI]? ; 
 DIGIT    : [0-9];
 DOT      : '.' ;   
 
