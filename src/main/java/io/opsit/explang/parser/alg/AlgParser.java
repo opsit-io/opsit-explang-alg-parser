@@ -794,8 +794,8 @@ public class AlgParser implements IParser, IAutoSuggester {
       // regular args
       ASTNList posArgs = null == ctx.posargs ? null : (ASTNList) visit(ctx.posargs);
       
-      boolean hasRest = null != ctx.rest ;
-      boolean hasKWRest = null != ctx.okeys ;
+      boolean hasRest = null != ctx.rest;
+      boolean hasKWRest = null != ctx.okeys;
       ASTNList result = new ASTNList(list(), makePctx(ctx));
 
       if (null != sym) {
@@ -816,8 +816,8 @@ public class AlgParser implements IParser, IAutoSuggester {
           ASTN arg = posArgs.get(i);
           boolean isSETF = isSETF(arg);
           if (isSETF && !isOptional) {
-              trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_OPTIONAL), arg.getPctx()));
-              isOptional = true;
+            trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_OPTIONAL), arg.getPctx()));
+            isOptional = true;
           }
           trArgList.add(transArg(arg));
         }
@@ -829,7 +829,7 @@ public class AlgParser implements IParser, IAutoSuggester {
         } 
         trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_KEY), kwargs.getPctx()));
         if (hasKWRest) {
-          trArgList.add(transArg(kwargs.get(kwargs.size()-1)));
+          trArgList.add(transArg(kwargs.get(kwargs.size() - 1)));
         }
         for (int i = 0; i < kwargs.size() - (hasKWRest ? 1 : 0); i++) {
           trArgList.add(transArg(kwargs.get(i)));
@@ -1038,12 +1038,10 @@ public class AlgParser implements IParser, IAutoSuggester {
     @Override
     public Object visitAssign_expr(AlgParserParser.Assign_exprContext ctx) {
       ParseCtx pctx = makePctx(ctx);
-      //final ASTN var = new ASTNLeaf(symbol(ctx.getChild(0).getText()), pctx);
       final ASTN var = (ASTN) visit(ctx.expr(0));
       final ASTN val = (ASTN) visit(ctx.expr(1));
-      //final ASTN val = (ASTN) visit(ctx.getChild(2));
-      //final String symName = ctx.op.getType() == AlgParserParser.GASSIGN ? "SETQ" : "SETV";
-      final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("SETF"), pctx), var, val), pctx);
+      final ASTNList result =
+          new ASTNList(list(new ASTNLeaf(symbol("SETF"), pctx), var, val), pctx);
       return result;
     }
 
@@ -1053,7 +1051,8 @@ public class AlgParser implements IParser, IAutoSuggester {
       ParseCtx pctx = makePctx(ctx);
       final ASTN var = new ASTNLeaf(symbol(ctx.getChild(0).getText()), pctx);
       final ASTN val = (ASTN) visit(ctx.getChild(2));
-      final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("SETQ"), pctx), var, val), pctx);
+      final ASTNList result =
+          new ASTNList(list(new ASTNLeaf(symbol("SETQ"), pctx), var, val), pctx);
       return result;
     }
 
@@ -1083,11 +1082,11 @@ public class AlgParser implements IParser, IAutoSuggester {
             break;
           case 'u':
           case 'U':
-          if (strVal.length() > 4) {
-            final int i = Integer.parseInt(strVal.substring(3, strVal.length()-1), 16);
-            c = (char) i;
-          }
-          break;
+            if (strVal.length() > 4) {
+              final int i = Integer.parseInt(strVal.substring(3, strVal.length() - 1), 16);
+              c = (char) i;
+            }
+            break;
           default:
             break;
         }
@@ -1415,24 +1414,25 @@ public class AlgParser implements IParser, IAutoSuggester {
 
     protected void convertArgList(ASTNList result, ASTNList args) {
       for (int i = 0; i < args.size(); i++) {
-          ASTN arg = args.get(i);
-          if (arg.isList()) {
-            final ASTNList argLst = (ASTNList)arg;
-            if (argLst.size() == 3
-                && !argLst.get(0).isList()
-                && symbol("SETF").equals(argLst.get(0).getObject())
-                && !argLst.get(1).isList()
-                && (argLst.get(1).getObject() instanceof Symbol)) {
-              result.add(new ASTNLeaf(new Keyword(":" + argLst.get(1).getObject()), argLst.get(1).getPctx()));
-              result.add(argLst.get(2));
-              continue;
-            }
+        ASTN arg = args.get(i);
+        if (arg.isList()) {
+          final ASTNList argLst = (ASTNList) arg;
+          if (argLst.size() == 3
+              && !argLst.get(0).isList()
+              && symbol("SETF").equals(argLst.get(0).getObject())
+              && !argLst.get(1).isList()
+              && (argLst.get(1).getObject() instanceof Symbol)) {
+            result.add(
+                new ASTNLeaf(
+                    new Keyword(":" + argLst.get(1).getObject()), argLst.get(1).getPctx()));
+            result.add(argLst.get(2));
+            continue;
           }
-          result.add(arg);
         }
+        result.add(arg);
+      }
     }
 
-    
     // '(' lambda ')' '('  exprList?  ')'
     @Override
     public Object visitLambdacall_expr(AlgParserParser.Lambdacall_exprContext ctx) {
@@ -1586,21 +1586,52 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
   }
 
+  private static String formatModifiers(ArgSpec.Arg arg) {
+    if (arg.isLazy() || arg.isPipe()) {
+      return "#= "
+        + (arg.isLazy()  ? "&LAZY " : "")
+        + (arg.isPipe()  ? "&PIPE " : "")
+        + " =# ";
+    } else {
+      return "";
+    }
+  }
+  
   @Override
-  public String formatArgSpec(List<String> spec) {
+  public String formatArgSpec(ArgSpec spec) {
+    // FIXME: kluge
     StringBuilder buf = new StringBuilder(64);
     if (null != spec) {
-      boolean isPrefix = false;
-      for (int idx = 0; idx < spec.size(); idx++) {
-        String str = spec.get(idx);
-        if (idx > 0) {
-          if (!isPrefix) {
-            buf.append(",");
+      List<String> posargs = new ArrayList<String>();
+      List<String> kwargs     = new ArrayList<String>();
+      boolean otherKeys = false;
+      for (int i = 0; i < spec.size(); i++) {
+        ArgSpec.Arg arg = spec.getArg(i);
+        ArgSpec.AF flag = arg.getFlag();
+        if (ArgSpec.AF.KEY == flag 
+            || ArgSpec.AF.REST_KEY == flag) {
+          if (arg.isAllowOtherKeys()) {
+            otherKeys = true;
           }
-          buf.append(" ");
+          kwargs.add(formatModifiers(arg)
+                     + arg.getName()
+                     + ":=" + (null == arg.getInit() ? "NIL" : arg.getInit()));
+        } else {
+          posargs.add(formatModifiers(arg)
+                     + arg.getName()
+                     + (arg.getFlag() == ArgSpec.AF.OPTIONAL
+                        ? ":=" + (null == arg.getInit() ? "NIL" : arg.getInit())
+                        : "")
+                     + (flag == ArgSpec.AF.REST ? "..." : "" ));
         }
-        buf.append(str);
-        isPrefix = str.startsWith("&");
+      }
+      buf.append(String.join(", ", posargs));
+      if (kwargs.size() > 0) {
+        buf.append("; ");
+        buf.append(String.join(", ", kwargs));
+      }
+      if (otherKeys) {
+        buf.append("...");
       }
     } else {
       buf.append(ArgSpec.ARG_REST).append("args");
