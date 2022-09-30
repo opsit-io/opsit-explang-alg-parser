@@ -1624,7 +1624,7 @@ public class AlgParser implements IParser, IAutoSuggester {
                      + (arg.getFlag() == ArgSpec.AF.OPTIONAL
                         ? ":=" + (null == arg.getInit() ? "NIL" : arg.getInit())
                         : "")
-                     + (flag == ArgSpec.AF.REST ? "..." : "" ));
+                     + (flag == ArgSpec.AF.REST ? "..." : ""));
         }
       }
       buf.append(String.join(", ", posargs));
