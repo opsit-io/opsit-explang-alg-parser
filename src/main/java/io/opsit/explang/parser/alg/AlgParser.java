@@ -97,6 +97,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       ParsingState pst = mkParsingState(reader);
       Exception problem = null;
       final List<SyntaxError> syntaxErrors = pst.listener.getSyntaxErrors();
+      ExprVisitor visitor = new ExprVisitor();
       if (null != syntaxErrors && syntaxErrors.size() > 0) {
         problem =
             new ParserExceptions(
@@ -104,17 +105,23 @@ public class AlgParser implements IParser, IAutoSuggester {
                 syntaxErrors.stream()
                     .map(se -> se2ParserException(pctx, se))
                     .collect(Collectors.toList()));
-      } // else {
-      ExprVisitor visitor = new ExprVisitor();
-      result = (ASTNList) visitor.visit(pst.tree);
+        try {
+          // attempt error recovery and return some tree anyway
+          result = (ASTNList) visitor.visit(pst.tree);
+        } catch (Exception ex) {
+          // nothing to do
+        }
+      } else {
+        result = (ASTNList) visitor.visit(pst.tree);
+      }
       if (null == result) {
-        new ASTNList(list(), pctx.clone());
+        result = new ASTNList(list(), pctx.clone());
       }
       if (null != problem) {
         result.problem = problem;
       }
     } catch (Exception ex) {
-      globalProblem = new ParserException(pctx.clone(), "AlgParser Exception", ex);
+      globalProblem = new ParserException(pctx.clone(), "AlgParser Exception: "+ex.getMessage(), ex);
     }
     ASTNList resultList = null == result ? new ASTNList(list(), pctx.clone()) : result;
     if (maxExprs < resultList.size()) {
