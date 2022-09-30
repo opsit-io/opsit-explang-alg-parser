@@ -165,6 +165,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       SyntaxErrorListener listener = new SyntaxErrorListener();
       // create a lexer that feeds off of input CharStream​
       AlgParserLexer lexer = new AlgParserLexer(inputStream);
+      lexer.removeErrorListeners();
       lexer.addErrorListener(listener);
       // create a buffer of tokens pulled from the lexer​
       // FIXME: customize type of token stream
@@ -172,6 +173,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       // TokenStream tokens = new UnbufferedTokenStream(lexer);
       // create a parser that feeds off the tokens buffer​
       AlgParserParser parser = new AlgParserParser(tokenStream);
+      parser.removeErrorListeners();
       parser.addErrorListener(listener);
       ParseTree tree = parser.replblock(); // begin parsing at init rule​*/
       return new ParsingState(parser, tree, tokenStream, listener);
