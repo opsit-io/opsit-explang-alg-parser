@@ -32,7 +32,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
           
       - name: Build and deploy with maven
-        run: mvn --batch-mode -P publish clean deploy
+        run: mvn --batch-mode -P publish clean install
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
