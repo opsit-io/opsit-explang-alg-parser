@@ -121,7 +121,10 @@ public class AlgParser implements IParser, IAutoSuggester {
         result.problem = problem;
       }
     } catch (Exception ex) {
-      globalProblem = new ParserException(pctx.clone(), "AlgParser Exception: "+ex.getMessage(), ex);
+      globalProblem = new ParserException(pctx.clone(),
+                                          "AlgParser Exception: "
+                                          + ex.getMessage(),
+                                          ex);
     }
     ASTNList resultList = null == result ? new ASTNList(list(), pctx.clone()) : result;
     if (maxExprs < resultList.size()) {
@@ -1474,7 +1477,7 @@ public class AlgParser implements IParser, IAutoSuggester {
     public ParseCtx makePctx(ParserRuleContext rctx) {
       // FIXME: offset
       final ParseCtx pctx =
-        new ParseCtx(srcName,
+          new ParseCtx(srcName,
                      rctx.start.getLine(),
                      rctx.start.getCharPositionInLine(),
                      -1,
