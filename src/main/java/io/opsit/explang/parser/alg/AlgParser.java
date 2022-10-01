@@ -97,7 +97,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       ParsingState pst = mkParsingState(reader);
       Exception problem = null;
       final List<SyntaxError> syntaxErrors = pst.listener.getSyntaxErrors();
-      ExprVisitor visitor = new ExprVisitor();
+      ExprVisitor visitor = new ExprVisitor(pctx.input);
       if (null != syntaxErrors && syntaxErrors.size() > 0) {
         problem =
             new ParserExceptions(
@@ -575,6 +575,12 @@ public class AlgParser implements IParser, IAutoSuggester {
   }
 
   public class ExprVisitor extends AlgParserBaseVisitor<Object> {
+    protected String srcName;
+
+    public ExprVisitor(String srcName) {
+      this.srcName = srcName;
+    }
+
     // 'IF' expr block ('ELSEIF' expr block)*  ( 'ELSE' block )? 'END';
     @Override
     public Object visitIf_expr(AlgParserParser.If_exprContext ctx) {
@@ -1463,16 +1469,20 @@ public class AlgParser implements IParser, IAutoSuggester {
       }
       return result;
     }
+
+    /** Make new Parse context on basis of ANTLR parsing information. */
+    public ParseCtx makePctx(ParserRuleContext rctx) {
+      // FIXME: offset
+      final ParseCtx pctx =
+        new ParseCtx(srcName,
+                     rctx.start.getLine(),
+                     rctx.start.getCharPositionInLine(),
+                     -1,
+                     rctx.getText().length());
+      return pctx;
+    }
   }
 
-  /** Make new Parse context on basis of ANTLR parsing information. */
-  public ParseCtx makePctx(ParserRuleContext rctx) {
-    // FIXME: really map th information
-    final ParseCtx pctx =
-        new ParseCtx(
-            rctx.getText(), /* line*/ -1, /* pos */ -1, /* offset */ 0, rctx.getText().length());
-    return pctx;
-  }
 
   private ASTN parseAtom(String string, ParseCtx pctx) {
     final Object[] holder = new Object[1];
