@@ -1,7 +1,7 @@
 Explang Algebraic Syntax Parser
 ===============================
 
-*Algebraic syntax parser for [Explang](https://github.com/opsit-io/opsit-explang-core) -
+*Algebraic syntax parser for [Explang](https://opsit-io.github.io/opsit-explang-docs/)
 a simple and customizable dynamic language for the Java platform*.
 
 This project strives to provide a simple Julia-like syntax for Explang
@@ -23,12 +23,13 @@ and the [ANTLR](https://www.antlr.org) framework
 Language Documentation
 ----------------------
 
-See [Explang Language Documentation](https://github.com/opsit-io/opsit-explang-docs):
 
-- [Language Overview](TBD)
-- [Language Functions Reference](TBD)
-- [javadoc](TBD) for the *explang-core* module
-- [javadoc](TBD) for the *explang-alg-parser* module
+See [Explang Language Documentation](https://opsit-io.github.io/opsit-explang-docs/):
+
+- [Explang Core Quick Start](https://opsit-io.github.io/opsit-explang-docs/explang-core-quick-start/)
+- [Explang Language Guide with algebraic syntax](https://opsit-io.github.io/opsit-explang-docs/explang-alg/)
+- [javadoc](https://javadocs.dev/io.opsit/opsit-explang-alg-parser/0.0.4/index.html) for the *explang-alg-parser* module
+- [Functions Reference](https://opsit-io.github.io/opsit-explang-docs/explang-alg-funcs-by-package/)
 
 Code Examples
 -------------
