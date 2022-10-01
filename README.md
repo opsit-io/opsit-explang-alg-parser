@@ -26,10 +26,11 @@ Language Documentation
 
 See [Explang Language Documentation](https://opsit-io.github.io/opsit-explang-docs/):
 
-- [Explang Core Quick Start](https://opsit-io.github.io/opsit-explang-docs/explang-core-quick-start/)
+- [Explang Algebgraic Parser Quick Start](https://opsit-io.github.io/opsit-explang-docs/explang-alg-parser-quick-start/)
 - [Explang Language Guide with algebraic syntax](https://opsit-io.github.io/opsit-explang-docs/explang-alg/)
-- [javadoc](https://javadocs.dev/io.opsit/opsit-explang-alg-parser/0.0.4/index.html) for the *explang-alg-parser* module
 - [Functions Reference](https://opsit-io.github.io/opsit-explang-docs/explang-alg-funcs-by-package/)
+- [javadoc](https://javadocs.dev/io.opsit/opsit-explang-alg-parser/0.0.4/index.html) for the *explang-alg-parser* module
+
 
 Code Examples
 -------------
