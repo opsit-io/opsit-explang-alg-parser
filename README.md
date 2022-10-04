@@ -29,7 +29,7 @@ See [Explang Language Documentation](https://opsit-io.github.io/opsit-explang-do
 - [Explang Algebgraic Parser Quick Start](https://opsit-io.github.io/opsit-explang-docs/explang-alg-parser-quick-start/)
 - [Explang Language Guide with algebraic syntax](https://opsit-io.github.io/opsit-explang-docs/explang-alg/)
 - [Functions Reference](https://opsit-io.github.io/opsit-explang-docs/explang-alg-funcs-by-package/)
-- [javadoc](https://javadocs.dev/io.opsit/opsit-explang-alg-parser/0.0.4/index.html) for the *explang-alg-parser* module
+- [javadoc](https://javadocs.dev/io.opsit/opsit-explang-alg-parser/0.0.5/index.html) for the *explang-alg-parser* module
 
 
 Code Examples
@@ -47,7 +47,7 @@ Download executable JAR jars from Github
 Or use maven CLI to fetch the artifact from maven central:
 
 ```
-mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -Dartifact=io.opsit:opsit-explang-alg-parser:0.0.4:jar:runnable   -Dtransitive=false -Ddest=opsit-explang-alg-parser-0.0.4-runnable.jar
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get -Dartifact=io.opsit:opsit-explang-alg-parser:0.0.5:jar:runnable   -Dtransitive=false -Ddest=opsit-explang-alg-parser-0.0.5-runnable.jar
 ```
 
 Using REPL
@@ -56,7 +56,7 @@ Using REPL
 Explang-core contains built-in REPL. 
 
 ```
-$ java -jar opsit-explang-alg-parser-0.0.4-runnable.jar
+$ java -jar opsit-explang-alg-parser-0.0.5-runnable.jar
 Welcome to the EXPLANG REPL!
 Active parser is AlgParser
 Loaded packages are: [base.math, base.text, io, base.bindings, ffi, base.funcs, loops, threads, base.version, base.coercion, base.logic, base.lang, base.arithmetics, base.seq, base.control, base.regex, dwim, base.docs, base.beans, base.types]
@@ -82,7 +82,7 @@ Executing Explang Scripts
 -------------------------
 
 ```shell
-$ java -jar opsit-explang-alg-parser-0.0.4-runnable.jar ./examples/hello.jl
+$ java -jar opsit-explang-alg-parser-0.0.5-runnable.jar ./examples/hello.jl
 Hello world
 ```
 
@@ -97,7 +97,7 @@ Quick Start Guide to Using Explang with Alg Parser from Java Code
   <dependency>
     <groupId>io.opsit</groupId>
     <artifactId>opsit-explang-alg-parser</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
   </dependency>
 ...
 </dependencies>
