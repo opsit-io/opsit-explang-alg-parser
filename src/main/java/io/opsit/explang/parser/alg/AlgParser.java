@@ -887,13 +887,13 @@ public class AlgParser implements IParser, IAutoSuggester {
       final ParseCtx pctx = makePctx(ctx);
 
       // AlgParserParser.ExprListContext exprList =  ctx.exprList();
-      final AlgParserParser.ExprContext vars = ctx.expr(0);
-      final AlgParserParser.ExprContext vals = ctx.expr(1);
-      final AlgParserParser.ExprContext ret = ctx.expr(2);
+      final AlgParserParser.ExprContext vars = ctx.loopfor().expr(0);
+      final AlgParserParser.ExprContext vals = ctx.loopfor().expr(1);
+      final AlgParserParser.ExprContext ret = ctx.loopfor().expr(2);
       final ASTN varsASTN = (ASTN) visit(vars);
       final ASTN valsASTN = (ASTN) visit(vals);
       final ASTN retASTN = null == ret ? null : (ASTN) visit(ret);
-      final ASTNList block = (ASTNList)visit(ctx.block());
+      final ASTNList block = (ASTNList)visit(ctx.loopfor().block());
 
       final List<ASTN>  args = list(varsASTN, valsASTN);
       if (null != retASTN) {

@@ -17,7 +17,7 @@ grammar AlgParser;
 expr    :   beblock                                         # beblock_expr
     |  IF expr block (ELSEIF expr block)*  ( ELSE block )? EB #if_expr
     |  WHILE expr block EB                                  # while_expr
-    |  FOR  expr INOP expr (RESULT expr)? block EB          # for_expr
+    |        loopfor                                        # for_expr
     |  RETURN expr                                          # return_expr
     |       expr ( '.' SYMBOL )+                            # dotchain
     |       expr ( vector )+                                # assoc_lookup
@@ -55,6 +55,7 @@ expr    :   beblock                                         # beblock_expr
     |       SYMBOL '->' expr                                # monolambda_expr                
     ; /* end of expr */
 
+loopfor : FOR  expr INOP expr (RESULT expr)? block EB ;
 lambda   : FUNC SYMBOL? '(' (posargs=exprList rest=ELLIPSIS? )? ( ';' kwargs=exprList okeys=ELLIPSIS? )? ')' block EB ;
 beblock  :  BB block EB                            ;
 replblock : block EOF                              ;
@@ -65,7 +66,7 @@ block    : expr (';' expr)*  ';'? ;
 fsymbol  : ( SYMBOL
         | ADDOP | SUBOP | ANDOP | OROP | MULOP | DIVOP
         | NUMLT | NUMGT | NUMGE | NUMLE
-        | NUMEQUAL | EQUAL | NOTEQUAL | ISSAME | INOP | DWIM_MATCHES ) ;
+        | NUMEQUAL | EQUAL | NOTEQUAL | ISSAME | INOP | DWIM_MATCHES | RESULT) ;
 atom     : ( NIL_LIT | NUMBER | TRUE_LIT | FALSE_LIT | fsymbol  | STRING | REGEXP | SYMFUNC | VERSION );
 
 //funop    : ( MULOP | DIVOP | ADDOP | SUBOP | ANDOP | 
