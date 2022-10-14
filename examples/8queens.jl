@@ -1,7 +1,7 @@
 ### The 8 Queens Problem
 
-N ::= 8;
-solutions ::= [];
+N := 8;
+solutions := [];
 
 function print_solution(s)
     for i in range(0, N)

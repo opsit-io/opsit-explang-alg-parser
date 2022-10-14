@@ -2,7 +2,7 @@
 
 function swap(a, i, j) 
     "swap two elements in an indexable sequence";
-    tmp := a[i];
+    local tmp := a[i];
     a[i] := a[j];
     a[j] := tmp;
 end;
@@ -15,9 +15,9 @@ end;
 
 function partition(a, lo, hi)
     "partition part of an indexable sequence a";
-    pivot := a[hi];
-    i := lo;
-    j := lo;
+    local pivot := a[hi];
+    local i := lo;
+    local j := lo;
     while j < hi
         if a[j] < pivot 
             swap(a, i, j);
@@ -32,7 +32,7 @@ end;
 function quick_sort (a, lo, hi)    
     "quick sort an indexable sequence or part of it if lo and hi parameters are set";
     if lo < hi
-        p := partition(a, lo, hi);
+        local p := partition(a, lo, hi);
         quick_sort(a, lo,    p - 1);
         quick_sort(a, p + 1, hi);
     end;

@@ -42,7 +42,7 @@ expr    :   beblock                                         # beblock_expr
     |<assoc=right>       expr  ASOP SYMBOL   '|'  expr      # th_as_expr
 
     |       expr '|'                                        # th_at_expr
-    |       SYMBOL GASSIGN  expr                            # gassign_expr
+    |       mod=(LOCAL | GLOBAL)  sym=(LOCAL|GLOBAL|SYMBOL) LASSIGN  expr  # vardecl_expr
     |       expr   LASSIGN  expr                            # assign_expr
 //    |       SYMFUNC                                         # symfunc_expr
     |       (IPOL_START expr (IPOL_MIDDLE expr )* IPOL_END | IPOL_VOID) # ipol_expr
@@ -66,7 +66,7 @@ block    : expr (';' expr)*  ';'? ;
 fsymbol  : ( SYMBOL
         | ADDOP | SUBOP | ANDOP | OROP | MULOP | DIVOP
         | NUMLT | NUMGT | NUMGE | NUMLE
-        | NUMEQUAL | EQUAL | NOTEQUAL | ISSAME | INOP | DWIM_MATCHES | RESULT) ;
+        | NUMEQUAL | EQUAL | NOTEQUAL | ISSAME | INOP | DWIM_MATCHES | RESULT | LOCAL | GLOBAL) ;
 atom     : ( NIL_LIT | NUMBER | TRUE_LIT | FALSE_LIT | fsymbol  | STRING | REGEXP | SYMFUNC | VERSION );
 
 //funop    : ( MULOP | DIVOP | ADDOP | SUBOP | ANDOP | 
@@ -103,6 +103,8 @@ NIL_LIT  : ([nN][uU][lL][lL]|[nN][iI][lL]);
 TRUE_LIT : [tT][rR][uU][eE];
 FALSE_LIT: [fF][aA][lL][sS][eE];
 NOTOP    : [nN][oO][tT];
+LOCAL    : [lL][oO][cC][aA][lL];
+GLOBAL   : [gG][lL][oO][bB][aA][lL];
 
 
 SYMBOL   : [A-Za-z_][A-Za-z_0-9!]*;
@@ -127,7 +129,7 @@ MULOP    : '*';
 REMOP    : '%';  
 
 LASSIGN  : ':=';
-GASSIGN  : '::=';
+//GASSIGN  : '::=';
 
 DWIM_MATCHES : '=~' ;
 //DWIM_SEARCH : [sS][eE][aA][rR][cC][hH] ;

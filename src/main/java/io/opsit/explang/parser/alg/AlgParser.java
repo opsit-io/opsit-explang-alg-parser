@@ -1063,14 +1063,21 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
-    // SYMBOL GASSIGN expr
+    // (LOCAL|GLOBAL)? SYMBOL LASSIGN expr
     @Override
-    public Object visitGassign_expr(AlgParserParser.Gassign_exprContext ctx) {
+    public Object visitVardecl_expr(AlgParserParser.Vardecl_exprContext ctx) {
       ParseCtx pctx = makePctx(ctx);
-      final ASTN var = new ASTNLeaf(symbol(ctx.getChild(0).getText()), pctx);
-      final ASTN val = (ASTN) visit(ctx.getChild(2));
+      final String op = ctx.mod == null ? null : ctx.mod.getText();
+      String setx = "SETV";
+      if ( "global".equalsIgnoreCase(op)) {
+        setx = "SETQ";
+      } else if ("local".equalsIgnoreCase(op)) {
+        setx = "SETL";
+      }
+      final ASTN var = new ASTNLeaf(symbol(ctx.sym.getText()), pctx);
+      final ASTN val = (ASTN) visit(ctx.expr());
       final ASTNList result =
-          new ASTNList(list(new ASTNLeaf(symbol("SETQ"), pctx), var, val), pctx);
+          new ASTNList(list(new ASTNLeaf(symbol(setx), pctx), var, val), pctx);
       return result;
     }
 
@@ -1691,7 +1698,7 @@ public class AlgParser implements IParser, IAutoSuggester {
           AlgParserParser.FIELDSOP, "Filter Fields from a Map",
           AlgParserParser.SEARCHOP, "Search",
           AlgParserParser.ASOP, "Introduce pipe variable name",
-          AlgParserParser.GASSIGN, "Global Variable Assign",
+          //AlgParserParser.GASSIGN, "Global Variable Assign",
           AlgParserParser.LASSIGN, "Local Variable Assign");
 
   private final Map<Integer, String> operatorTokenTypes =
@@ -1716,6 +1723,6 @@ public class AlgParser implements IParser, IAutoSuggester {
           AlgParserParser.SEARCHOP, "SEARCH",
           AlgParserParser.FIELDSOP, "FIELDS",
           AlgParserParser.ASOP, "AS",
-          AlgParserParser.GASSIGN, "::=", // assignment
+          //          AlgParserParser.GASSIGN, "::=", // assignment
           AlgParserParser.LASSIGN, ":=");
 }
