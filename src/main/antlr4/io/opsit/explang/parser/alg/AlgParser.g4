@@ -18,6 +18,7 @@ expr    :   beblock                                         # beblock_expr
     |  IF expr block (ELSEIF expr block)*  ( ELSE block )? EB #if_expr
     |  WHILE expr block EB                                  # while_expr
     |        loopfor                                        # for_expr
+    |  LET (SYMBOL LASSIGN expr (',' SYMBOL LASSIGN  expr)*)? block EB # let_expr
     |  RETURN expr                                          # return_expr
     |       expr ( '.' SYMBOL )+                            # dotchain
     |       expr ( vector )+                                # assoc_lookup
@@ -66,7 +67,7 @@ block    : expr (';' expr)*  ';'? ;
 fsymbol  : ( SYMBOL
         | ADDOP | SUBOP | ANDOP | OROP | MULOP | DIVOP
         | NUMLT | NUMGT | NUMGE | NUMLE
-        | NUMEQUAL | EQUAL | NOTEQUAL | ISSAME | INOP | DWIM_MATCHES | RESULT | LOCAL | GLOBAL) ;
+        | NUMEQUAL | EQUAL | NOTEQUAL | ISSAME | INOP | DWIM_MATCHES | RESULT | LOCAL | GLOBAL | LET) ;
 atom     : ( NIL_LIT | NUMBER | TRUE_LIT | FALSE_LIT | fsymbol  | STRING | REGEXP | SYMFUNC | VERSION );
 
 //funop    : ( MULOP | DIVOP | ADDOP | SUBOP | ANDOP | 
@@ -105,6 +106,7 @@ FALSE_LIT: [fF][aA][lL][sS][eE];
 NOTOP    : [nN][oO][tT];
 LOCAL    : [lL][oO][cC][aA][lL];
 GLOBAL   : [gG][lL][oO][bB][aA][lL];
+LET      : [lL][eE][tT];
 
 
 SYMBOL   : [A-Za-z_][A-Za-z_0-9!]*;

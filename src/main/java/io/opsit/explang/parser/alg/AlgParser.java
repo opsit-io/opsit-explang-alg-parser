@@ -1063,6 +1063,23 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
+    // LET (SYMBOL LASSIGN expr (',' SYMBOL LASSIGN  expr)*)? block EB # let_expr
+    @Override
+    public Object visitLet_expr(AlgParserParser.Let_exprContext ctx) {
+      ParseCtx pctx = makePctx(ctx);
+      final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("LET"), pctx)), pctx);
+      final int numVars = ctx.SYMBOL().size();
+      final ASTNList vars = new ASTNList(list(), pctx);
+      for (int idx = 0; idx < numVars; idx++) {
+        final ASTN val = (ASTN) visit(ctx.expr(idx));
+        vars.add(
+            new ASTNList(list(new ASTNLeaf(symbol(ctx.SYMBOL(idx).getText()), pctx), val), pctx));
+      }
+      result.add(vars);
+      result.addAll((ASTNList) visit(ctx.block()));
+      return result;
+    }
+
     // (LOCAL|GLOBAL)? SYMBOL LASSIGN expr
     @Override
     public Object visitVardecl_expr(AlgParserParser.Vardecl_exprContext ctx) {
