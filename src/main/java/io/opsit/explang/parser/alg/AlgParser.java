@@ -1019,20 +1019,85 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
-    // expr  DWIM_MATCHES expr                         # dwim_matches_expr
+    @Override
+    public Object visitFspart(AlgParserParser.FspartContext ctx) {
+       final ParseCtx pctx = makePctx(ctx);
+       if (null != ctx.STRING()) {
+         String[] holder = new String[1];
+         if (! escStringParser.parse(ctx.STRING().getText(), holder, pctx)) {
+           throw new RuntimeException("Internal error: failed to parse string in fspart: '"
+                                      + ctx.STRING() + "'");
+         }
+         return new ASTNLeaf(holder[0], pctx);
+       }
+       if (null != ctx.SYMBOL()) {
+         return new ASTNLeaf(ctx.SYMBOL().getText(), pctx);
+       }
+       throw new RuntimeException("Internal error: failed to parse fspart: not a string and not a symbol");
+    }
+
+    //  fspart ('.' fspart)*  ('(' fieldspec (',' fieldspec)* ')')?  (ASOP fspart)?
+    @Override
+    public Object visitFieldspec(AlgParserParser.FieldspecContext ctx) {
+      ASTN dstASTN = null;
+      if (ctx.ASOP() != null) {
+        AlgParserParser.FspartContext dst = ctx.fspart(ctx.fspart().size()-1);
+        dstASTN = (ASTN) visit(dst);
+      }
+      final ASTNList src = new ASTNList(list(new ASTNLeaf(symbol("LIST"),makePctx(ctx))), makePctx(ctx));
+
+      ASTNList subspecs = null;
+      if (ctx.fieldspec().size() > 0) {
+        subspecs = new ASTNList(list(new ASTNLeaf(symbol("LIST"),makePctx(ctx))), makePctx(ctx));
+        for (int specIdx = 0; specIdx < ctx.fieldspec().size(); specIdx++) {
+          subspecs.add((ASTN) visit(ctx.fieldspec(specIdx)));
+        }
+      }
+      
+      
+      ASTN srcPartASTN = null;
+      int numSrcParts = (ctx.fspart().size() - (null == dstASTN ? 0 : 1));
+      for (int partIdx = 0; partIdx < numSrcParts; partIdx++) {
+        AlgParserParser.FspartContext srcPart = ctx.fspart(partIdx);
+        srcPartASTN = (ASTN)visit(srcPart);
+        src.add(srcPartASTN);
+      }
+      if (null == dstASTN && (numSrcParts == 1) && subspecs == null) {
+        return srcPartASTN;
+      }
+      if (null == dstASTN) {
+        if (null == subspecs) {
+          // if no destination use last part of source as destination key
+          dstASTN = srcPartASTN;
+        } else {
+          dstASTN = new ASTNLeaf(null, makePctx(ctx));
+        }
+      }
+
+      ASTNList specASTN = new ASTNList(list(new ASTNLeaf(symbol("LIST"),makePctx(ctx))), makePctx(ctx));
+      
+      specASTN.add((numSrcParts == 1) ? srcPartASTN : src);
+      specASTN.add(dstASTN);
+      if (null != subspecs) {
+        specASTN.add(subspecs);
+      }
+      return specASTN;
+      
+    }
+    
+    // expr  FIELDSOP  fieldspec (',' fieldspec)*
     @Override
     public Object visitFields_expr(AlgParserParser.Fields_exprContext ctx) {
       final ParseCtx pctx = makePctx(ctx);
-      final int childCount = ctx.getChildCount();
-      final ASTN obj = (ASTN) visit(ctx.getChild(0));
+      final ASTN obj = (ASTN) visit(ctx.expr());
+
+      final int specsSize = ctx.fieldspec().size();
       final ASTNList ks = new ASTNList(list(new ASTNLeaf(symbol("LIST"), pctx)), pctx);
-      for (int i = 2; i < childCount; i += 2) {
-        String field = ctx.getChild(i).getText();
-        ks.add(new ASTNLeaf(field, pctx));
+      for (int specIdx = 0; specIdx < specsSize; specIdx++) {
+        ks.add((ASTN) visit(ctx.fieldspec(specIdx)));
       }
       ASTNList result =
-          new ASTNList(list(new ASTNLeaf(symbol("DWIM_FIELDS"), pctx), obj, ks), pctx);
-
+        new ASTNList(list(new ASTNLeaf(symbol("DWIM_FIELDS"), pctx), obj, ks), pctx);
       return result;
     }
 

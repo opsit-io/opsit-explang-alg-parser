@@ -37,7 +37,7 @@ expr    :   beblock                                         # beblock_expr
     |       expr  INOP     expr                             # in_expr
     |       expr  DWIM_MATCHES expr                         # dwim_matches_expr
     |       expr  SEARCHOP  expr                            # dwim_search_expr        
-    |       expr  FIELDSOP  SYMBOL (',' SYMBOL)*            # fields_expr
+    |       expr  FIELDSOP  fieldspec (',' fieldspec)*      # fields_expr
 //    |<assoc=right>       expr  ( ASOP SYMBOL)?   '|' rs=expr  { !$rs.text.startsWith("[")  }?         # th_as_expr
     |<assoc=right>       expr   '|' ((vector)+ | expr )     # th_auto_expr        
     |<assoc=right>       expr  ASOP SYMBOL   '|'  expr      # th_as_expr
@@ -61,6 +61,9 @@ lambda   : FUNC SYMBOL? '(' (posargs=exprList rest=ELLIPSIS? )? ( ';' kwargs=exp
 beblock  :  BB block EB                            ;
 replblock : block EOF                              ;
 
+fspart : (SYMBOL | STRING);
+fieldspec : fspart ('.' fspart)*  ('(' fieldspec (',' fieldspec)* ')')?  (ASOP fspart)?;
+        
 vector   : '['  exprList?  ']' ;
 exprList : expr (',' expr)*       ;
 block    : expr (';' expr)*  ';'? ;
@@ -69,6 +72,7 @@ fsymbol  : ( SYMBOL
         | NUMLT | NUMGT | NUMGE | NUMLE
         | NUMEQUAL | EQUAL | NOTEQUAL | ISSAME | INOP | DWIM_MATCHES | RESULT | LOCAL | GLOBAL | LET) ;
 atom     : ( NIL_LIT | NUMBER | TRUE_LIT | FALSE_LIT | fsymbol  | STRING | REGEXP | SYMFUNC | VERSION );
+
 
 //funop    : ( MULOP | DIVOP | ADDOP | SUBOP | ANDOP | 
 /* lexer rules */
