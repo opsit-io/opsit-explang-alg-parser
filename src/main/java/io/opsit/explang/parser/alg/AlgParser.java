@@ -604,73 +604,10 @@ public class AlgParser implements IParser, IAutoSuggester {
     // expr as var ( | expr )+
     @Override
     public Object visitTh_at_expr(AlgParserParser.Th_at_exprContext ctx) {
-      // ParseCtx pctx = makePctx(ctx);
-      ASTN e = (ASTN) visit(ctx.expr());
-      // ASTN at = new ASTNLeaf(symbol("@"), pctx);
-      // ASTNList result = new ASTNList(list(e, at), pctx);
+      final ASTN e = (ASTN) visit(ctx.expr());
       return e;
     }
 
-    /*
-    @Override
-    public Object visitTh_at_infix_expr(AlgParserParser.Th_at_infix_exprContext ctx) {
-    final ParseCtx pctx = makePctx(ctx);
-    final ASTN startExpr = (ASTN) visit(ctx.getChild(0));
-    final ASTN targetExpr = (ASTN) visit(ctx.getChild(2));
-
-    ASTNList result =
-    new ASTNList(list(new ASTNLeaf(symbol("->"), pctx),
-    startExpr,
-    targetExpr), pctx);
-
-    //for (int i = 4; i < ctx.getChildCount(); i+=2) {
-    //    ASTN expr = (ASTN) visit(ctx.getChild(i));
-    //    result.add(expr);
-    //}
-    return result;
-    }*/
-
-    // @Override
-    // public Object visitSeq_iterator_expr(AlgParserParser.Seq_iterator_exprContext ctx) {
-    //     final ParseCtx pctx = makePctx(ctx);
-    //     final ASTN seqExpr = (ASTN) visit(ctx.getChild(0));
-    //     final ASTN iterExpr = (ASTN) visit(ctx.getChild(3));
-    //     ASTN result =
-    //         // FIXME: lambda arg name
-    //         //        what if inside AS->?
-    //         ASTNize(list(symbol("MAP"),
-    //                      list(symbol("LAMBDA"),
-    //                           list(symbol("%1%")),
-    //                           list(symbol("@->"),
-    //                                symbol("%1%"),
-    //                                iterExpr)),
-    //                      seqExpr), pctx);
-
-    //     return result;
-    // }
-
-    /*private ASTN ASTNize(Object param, ParseCtx ctx) {
-    if (param instanceof List) {
-      // ;ASTN lst = new ASTN
-      List<ASTN> astnList = new ArrayList<ASTN>(((List) param).size());
-      for (Object obj : (List) param) {
-        final ASTN node = ASTNize(obj, ctx);
-        astnList.add(node);
-      }
-      return new ASTNList(astnList, ctx);
-    } else if (param instanceof ASTN) {
-      return (ASTN) param;
-    } else {
-      return new ASTNLeaf(param, ctx);
-    }
-    }*/
-    // expr (as var)? (| expr )+
-    // it works somewhat non-trivially:
-    // the operator is right-associative, so originally
-    // it gets parsed as
-    // (A | (B | ...X))
-    // and then recursively flattened into
-    // (-> A B .. X)
     @Override
     public Object visitTh_auto_expr(AlgParserParser.Th_auto_exprContext ctx) {
       final ParseCtx pctx = makePctx(ctx);
@@ -746,12 +683,11 @@ public class AlgParser implements IParser, IAutoSuggester {
       final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("WHILE"), pctx),
                                                 expr,
                                                 blocks), pctx);
-
       return result;
     }
 
     // short lambda notation with one argument
-    // symbol '->' expr 
+    // symbol '->' expr
     @Override
     public Object visitMonolambda_expr(AlgParserParser.Monolambda_exprContext ctx) {
       final ParseCtx pctx = makePctx(ctx);
@@ -763,7 +699,7 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
 
     // short lambda notation
-    //  '('  exprList?  ')' '->' expr 
+    //  '('  exprList?  ')' '->' expr
     @Override
     public Object visitSlambda_expr(AlgParserParser.Slambda_exprContext ctx) {
       ParseCtx pctx = makePctx(ctx);
@@ -797,9 +733,9 @@ public class AlgParser implements IParser, IAutoSuggester {
       }
       return result;
     }
-    
-   
-    
+
+
+
     // lambda   : 'FUNCTION' SYMBOL? '(' exprList? ... ( ';' exprList? ... )?  ')' block 'END'
     //                                  ^args      ^rest     ^kw args  ^other keys
     @Override
@@ -811,7 +747,7 @@ public class AlgParser implements IParser, IAutoSuggester {
 
       // regular args
       ASTNList posArgs = null == ctx.posargs ? null : (ASTNList) visit(ctx.posargs);
-      
+
       boolean hasRest = null != ctx.rest;
       boolean hasKWRest = null != ctx.okeys;
       ASTNList result = new ASTNList(list(), makePctx(ctx));
@@ -822,7 +758,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       } else {
         result.add(new ASTNLeaf(symbol("LAMBDA"), pctx));
       }
-      
+
       if (hasRest && hasKWRest) {
         throw new RuntimeException("Cannot have both regular and key-value varargs");
       }
@@ -842,9 +778,9 @@ public class AlgParser implements IParser, IAutoSuggester {
       }
       ASTNList kwargs  = null == ctx.kwargs ? null : (ASTNList) visit(ctx.kwargs);
       if (null != kwargs) {
-        if (hasKWRest) { 
+        if (hasKWRest) {
           trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_REST), kwargs.getPctx()));
-        } 
+        }
         trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_KEY), kwargs.getPctx()));
         if (hasKWRest) {
           trArgList.add(transArg(kwargs.get(kwargs.size() - 1)));
@@ -861,7 +797,7 @@ public class AlgParser implements IParser, IAutoSuggester {
         trArgList.add(new ASTNLeaf(new Symbol(ArgSpec.ARG_REST), arg.getPctx()));
         trArgList.add(transArg(arg));
       }
-      result.add(trArgList);      
+      result.add(trArgList);
       ASTNList block = (ASTNList) visit(ctx.block());
       result.addAll(block);
       return result;
@@ -905,7 +841,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
-    
+
     @Override
     public Object visitVector_expr(AlgParserParser.Vector_exprContext ctx) {
       final ParseCtx pctx = makePctx(ctx);
@@ -1021,19 +957,19 @@ public class AlgParser implements IParser, IAutoSuggester {
 
     @Override
     public Object visitFspart(AlgParserParser.FspartContext ctx) {
-       final ParseCtx pctx = makePctx(ctx);
-       if (null != ctx.STRING()) {
-         String[] holder = new String[1];
-         if (! escStringParser.parse(ctx.STRING().getText(), holder, pctx)) {
-           throw new RuntimeException("Internal error: failed to parse string in fspart: '"
-                                      + ctx.STRING() + "'");
-         }
-         return new ASTNLeaf(holder[0], pctx);
-       }
-       if (null != ctx.SYMBOL()) {
-         return new ASTNLeaf(ctx.SYMBOL().getText(), pctx);
-       }
-       throw new RuntimeException("Internal error: failed to parse fspart: not a string and not a symbol");
+      final ParseCtx pctx = makePctx(ctx);
+      if (null != ctx.STRING()) {
+        String[] holder = new String[1];
+        if (! escStringParser.parse(ctx.STRING().getText(), holder, pctx)) {
+          throw new RuntimeException("Internal error: failed to parse string in fspart: '"
+                                     + ctx.STRING() + "'");
+        }
+        return new ASTNLeaf(holder[0], pctx);
+      }
+      if (null != ctx.SYMBOL()) {
+        return new ASTNLeaf(ctx.SYMBOL().getText(), pctx);
+      }
+      throw new RuntimeException("Internal error: failed to parse fspart: not a string and not a symbol");
     }
 
     //  fspart ('.' fspart)*  ('(' fieldspec (',' fieldspec)* ')')?  (ASOP fspart)?
@@ -1053,8 +989,8 @@ public class AlgParser implements IParser, IAutoSuggester {
           subspecs.add((ASTN) visit(ctx.fieldspec(specIdx)));
         }
       }
-      
-      
+
+
       ASTN srcPartASTN = null;
       int numSrcParts = (ctx.fspart().size() - (null == dstASTN ? 0 : 1));
       for (int partIdx = 0; partIdx < numSrcParts; partIdx++) {
@@ -1075,16 +1011,16 @@ public class AlgParser implements IParser, IAutoSuggester {
       }
 
       ASTNList specASTN = new ASTNList(list(new ASTNLeaf(symbol("LIST"),makePctx(ctx))), makePctx(ctx));
-      
+
       specASTN.add((numSrcParts == 1) ? srcPartASTN : src);
       specASTN.add(dstASTN);
       if (null != subspecs) {
         specASTN.add(subspecs);
       }
       return specASTN;
-      
+
     }
-    
+
     // expr  FIELDSOP  fieldspec (',' fieldspec)*
     @Override
     public Object visitFields_expr(AlgParserParser.Fields_exprContext ctx) {
@@ -1202,7 +1138,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       return astn;
     }
 
-    
+
     @Override
     public Object visitAtom_expr(AlgParserParser.Atom_exprContext ctx) {
       final String strVal = ctx.getText();
@@ -1707,7 +1643,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       return "";
     }
   }
-  
+
   @Override
   public String formatArgSpec(ArgSpec spec) {
     // FIXME: kluge
@@ -1719,7 +1655,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       for (int i = 0; i < spec.size(); i++) {
         ArgSpec.Arg arg = spec.getArg(i);
         ArgSpec.AF flag = arg.getFlag();
-        if (ArgSpec.AF.KEY == flag 
+        if (ArgSpec.AF.KEY == flag
             || ArgSpec.AF.REST_KEY == flag) {
           if (arg.isAllowOtherKeys()) {
             otherKeys = true;
@@ -1761,7 +1697,7 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
     return false;
   }
-  
+
   // FIXME: use rule labels somehow?
   private final Map<Integer, String> tokenDescrs =
       map(

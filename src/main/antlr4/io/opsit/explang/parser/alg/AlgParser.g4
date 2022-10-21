@@ -13,6 +13,8 @@ grammar AlgParser;
 // TODO:
 // exponential notation >> unary - + operators
 // power (higher precision)
+// let x (w/o val)
+// !=  not equal        
 
 expr    :   beblock                                         # beblock_expr
     |  IF expr block (ELSEIF expr block)*  ( ELSE block )? EB #if_expr
