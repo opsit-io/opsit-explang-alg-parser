@@ -4,6 +4,10 @@ import io.opsit.explang.IStringConverter;
 
 public class AlgConverter implements IStringConverter {
   public String convert(String str) {
-    return null == str ? null : str.toUpperCase().replaceAll("-", "_");
+    return null == str
+      ? null
+      : ("-".equals(str)
+         ? str
+         :str.toUpperCase().replace('-', '_'));
   }
 }

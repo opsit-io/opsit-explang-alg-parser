@@ -25,6 +25,7 @@ import io.opsit.explang.Compiler;
 import io.opsit.explang.ICode;
 import io.opsit.explang.IParser;
 import io.opsit.explang.Keyword;
+import io.opsit.explang.OperatorDesc;
 import io.opsit.explang.ParseCtx;
 import io.opsit.explang.ParserException;
 import io.opsit.explang.ParserExceptions;
@@ -229,6 +230,109 @@ public class AlgParser implements IParser, IAutoSuggester {
   // public boolean checkCandidate(Integer tokType, List<Integer> toks, Tokenization t) {
   // return false;
   // }
+  OperatorDesc[] operatorDescs = {
+    new OperatorDesc("+", "+", "a + b"),
+    new OperatorDesc("-", "-", "a - b", "- x"),
+    new OperatorDesc("*", "*", "a * b"),
+    new OperatorDesc("/", "/", "a / b"),
+    new OperatorDesc("%", "%", "a % b"),
+    new OperatorDesc("<", "<", "a < b"),
+    new OperatorDesc("<=", "<=", "a <= b"),
+    new OperatorDesc(">", ">", "a > b"),
+    new OperatorDesc(">=", ">=", "a >= b"),
+    new OperatorDesc("!=", "!=", "a != b"),
+    new OperatorDesc("==", "==", "a == b"),
+    new OperatorDesc("===", "===", "a === b"),
+    new OperatorDesc("=", "=", "a = b"),
+    new OperatorDesc("in", "IN", "a in [1, 2, 3]", "h in \"hello\""),
+    new OperatorDesc(":=", "SETF",
+                     "var := expr;",
+                     "[var1, var2, var3] := [ val1, val2, val3];",
+                     "[var1, [var2, var3]] := [ val1, [val2, val3]];",
+                     "{var1 : \"key1\", var2 : \"key2\"} := {\"key2\" : val2, \"key1\" : val1};"),
+    new OperatorDesc(":=", "SETL",
+                     "local var := expr;"),
+    new OperatorDesc(":=", "SETQ",
+                     "global var := expr;"),
+    new OperatorDesc("not", "NOT", "not x"),
+    new OperatorDesc("and", "AND", "x and b"),
+    new OperatorDesc("or",  "OR", "x or b"),
+    new OperatorDesc("while", "WHILE",
+                     ""
+                     + "while (conditional expr)\n"
+                     + "  expression;\n"
+                     + "  ...\n"
+                     + "end\n"),
+    new OperatorDesc("if", "COND", ""
+                     + "if condition\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "end\n",
+                     ""
+                     + "if condition1\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "elseif condition2\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "else\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "end\n"),
+    new OperatorDesc("let", "LET", ""
+                     + "let var1 := val1, var2, var3:=val3\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "end\n"),
+    new OperatorDesc("return", "RETURN", "return value;"),
+    new OperatorDesc(".", "GET_IN", "a.b", "a.b.c"),
+    new OperatorDesc("[]", "GET_IN", "a[1]", "a[1][2]","b[\"foo\"]"),
+    new OperatorDesc("begin","PROGN", ""
+                     + "begin\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "end"),
+    new OperatorDesc("search","SEARCH",
+                     "[val1, val2, val3] SEARCH r\"regexp\"",
+                     "[val1, val2, val3] SEARCH \"substring\"",
+                     "[val1, val2, val3] SEARCH \"substring\"",
+                     "[val1, val2, val3] SEARCH atom",
+                     "[val1, val2, val3] SEARCH predicate_expression"),
+    new OperatorDesc("=~","DWIM_MATCHES",
+                     "value =~ r\"regexp\"",
+                     "value =~ \"substring\"",
+                     "value =~ value2",
+                     "value =~ predicate_expression"),
+    new OperatorDesc("for", "FOREACH", ""
+                     + "FOR var IN sequence\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "end",
+                     ""
+                     + "FOR var IN sequence RESULT expr\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "end"),
+    new OperatorDesc("function", "DEFUN", ""
+                     + "function symbol ( arglist )\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "end;"),
+    new OperatorDesc("function", "LAMBDA", ""
+                     + "function ( arglist )\n"
+                     + "  expr;\n"
+                     + "  ...\n"
+                     + "end"),
+    new OperatorDesc("->", "LAMBDA", "( arglist ) -> expr", "var -> expr")
+  };
+
+
+  @Override
+  public OperatorDesc[] getOperatorDescs() {
+    return operatorDescs;
+  }
+
+
 
   @Override
   public SourceInfo autoSuggest(
