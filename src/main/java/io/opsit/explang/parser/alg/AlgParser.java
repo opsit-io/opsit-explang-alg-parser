@@ -1748,6 +1748,23 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
   }
 
+  protected boolean isParen(String str) {
+    return "(".equals(str) || ")".equals(str);
+  }
+
+  protected String argsJoin(List<String> args) {
+    final StringBuilder buf = new StringBuilder();
+    final int size = args.size();
+    for (int i = 0; i < size; i++) {
+      final String arg = args.get(i);
+      buf.append(arg);
+      if (i < size - 1 && (!("(".equals(arg) || ")".equals(args.get(i + 1))))) {
+        buf.append(", ");
+      }
+    }
+    return buf.toString();
+  }
+
   @Override
   public String formatArgSpec(ArgSpec spec) {
     // FIXME: kluge
@@ -1764,28 +1781,32 @@ public class AlgParser implements IParser, IAutoSuggester {
           if (arg.isAllowOtherKeys()) {
             otherKeys = true;
           }
-          kwargs.add(formatModifiers(arg)
-                     + arg.getName()
-                     + ":=" + (null == arg.getInit() ? "NIL" : arg.getInit()));
+          kwargs.add(isParen(arg.getName())
+                     ? arg.getName()
+                     : (formatModifiers(arg)
+                        + arg.getName()
+                        + ":=" + (null == arg.getInit() ? "NIL" : arg.getInit())));
         } else {
-          posargs.add(formatModifiers(arg)
-                     + arg.getName()
-                     + (arg.getFlag() == ArgSpec.AF.OPTIONAL
-                        ? ":=" + (null == arg.getInit() ? "NIL" : arg.getInit())
-                        : "")
-                     + (flag == ArgSpec.AF.REST ? "..." : ""));
+          posargs.add(isParen(arg.getName())
+                      ? arg.getName()
+                      : (formatModifiers(arg)
+                         + arg.getName()
+                         + ((flag == ArgSpec.AF.OPTIONAL )
+                            ? ":=" + (null == arg.getInit() ? "NIL" : arg.getInit())
+                            : "")
+                         + ((flag == ArgSpec.AF.REST ) ? "..." : "")));
         }
       }
-      buf.append(String.join(", ", posargs));
+      buf.append(argsJoin(posargs));
       if (kwargs.size() > 0) {
         buf.append("; ");
-        buf.append(String.join(", ", kwargs));
+        buf.append(argsJoin(kwargs));
       }
       if (otherKeys) {
         buf.append("...");
       }
     } else {
-      buf.append(ArgSpec.ARG_REST).append("args");
+      buf.append("args...");
     }
     return buf.toString();
   }
