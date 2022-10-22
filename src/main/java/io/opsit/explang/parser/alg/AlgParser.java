@@ -1168,17 +1168,30 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
+    @Override
+    public Object visitOptassign(AlgParserParser.OptassignContext ctx) {
+      ParseCtx pctx = makePctx(ctx);
+      ASTNList result = new ASTNList(list(new ASTNLeaf(symbol(ctx.SYMBOL().getText()), pctx)), pctx);
+      if (null != ctx.expr()) {
+        final ASTN val = (ASTN) visit(ctx.expr());
+        result.add(val);
+      }
+      return result;
+    }
+    
+    
     // LET (SYMBOL LASSIGN expr (',' SYMBOL LASSIGN  expr)*)? block EB # let_expr
     @Override
     public Object visitLet_expr(AlgParserParser.Let_exprContext ctx) {
       ParseCtx pctx = makePctx(ctx);
       final ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("LET"), pctx)), pctx);
-      final int numVars = ctx.SYMBOL().size();
+      final int numVars = ctx.optassign().size();
+      
       final ASTNList vars = new ASTNList(list(), pctx);
       for (int idx = 0; idx < numVars; idx++) {
-        final ASTN val = (ASTN) visit(ctx.expr(idx));
-        vars.add(
-            new ASTNList(list(new ASTNLeaf(symbol(ctx.SYMBOL(idx).getText()), pctx), val), pctx));
+        //final ASTN val = (ASTN) visit(ctx.expr(idx));
+        vars.add((ASTN) visit(ctx.optassign(idx)));
+        //    new ASTNList(list(new ASTNLeaf(symbol(ctx.SYMBOL(idx).getText()), pctx), val), pctx));
       }
       result.add(vars);
       result.addAll((ASTNList) visit(ctx.block()));

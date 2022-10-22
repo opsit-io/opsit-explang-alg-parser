@@ -20,7 +20,7 @@ expr    :   beblock                                         # beblock_expr
     |  IF expr block (ELSEIF expr block)*  ( ELSE block )? EB #if_expr
     |  WHILE expr block EB                                  # while_expr
     |        loopfor                                        # for_expr
-    |  LET (SYMBOL LASSIGN expr (',' SYMBOL LASSIGN  expr)*)? block EB # let_expr
+    |  LET (optassign (',' optassign)*)? ';'?  block EB     # let_expr
     |  RETURN expr                                          # return_expr
     |       expr ( '.' SYMBOL )+                            # dotchain
     |       expr ( vector )+                                # assoc_lookup
@@ -62,6 +62,7 @@ loopfor : FOR  expr INOP expr (RESULT expr)? block EB ;
 lambda   : FUNC SYMBOL? '(' (posargs=exprList rest=ELLIPSIS? )? ( ';' kwargs=exprList okeys=ELLIPSIS? )? ')' block EB ;
 beblock  :  BB block EB                            ;
 replblock : block EOF                              ;
+optassign : SYMBOL (LASSIGN expr)?                 ;
 
 fspart : (SYMBOL | STRING);
 fieldspec : fspart ('.' fspart)*  ('(' fieldspec (',' fieldspec)* ')')?  (ASOP fspart)?;
