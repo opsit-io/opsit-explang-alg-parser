@@ -29,8 +29,8 @@ function partition(a, lo, hi)
     i;
 end;
 
-function quick_sort (a, lo, hi)    
-    "quick sort an indexable sequence or part of it if lo and hi parameters are set";
+function quick_sort (a, lo := 0, hi := length(a) - 1)    
+    "quick sort an indexable sequence or part of it ";
     if lo < hi
         local p := partition(a, lo, hi);
         quick_sort(a, lo,    p - 1);
@@ -54,7 +54,7 @@ samples := [
 for data in  samples
     print(i"Using quick sort on:  $(type_of(data))\n");
     print(i"input=$(data)\n");
-    quick_sort(data, 0, length(data) - 1);
+    quick_sort(data);
     print(i"output=$(data)\n\n");
 end;
            

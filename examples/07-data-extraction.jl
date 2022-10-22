@@ -1,7 +1,8 @@
 ### Data Search and Extraction
 
-# Examples of data extraction from nested data structures. The structure is based on 
-# examples in the book "Data Oriented Programming" by Yehonatan Sharvit.
+# Examples of data extraction from nested data structures. The structure is
+# based on examples in the book
+# "Data Oriented Programming" by Yehonatan Sharvit.
 
 function main()
     # Get input data, see it below at the end of file
@@ -24,9 +25,10 @@ function main()
 
     println(i"\nGet entry by key (ISBN) and make of it new object:");
     isbn:="978-1779501127";
-    getData().booksByIsbn[isbn] |
-        apply(x -> { "title" : x.title,
-                     "authors" : authorIdsToDescr(getData(), x.authorIds) } ) | println();
+    getData().booksByIsbn[isbn]
+    | apply(x -> { "title" : x.title,
+                   "authors" : authorIdsToDescr(getData(), x.authorIds) })
+    | println();
 
 
     # Convert map to list of keys - use the subscript operator [] 
@@ -56,27 +58,42 @@ function main()
 
     # Build list of unique values of tags
     println("\nGet set of used tags");
-    getData().booksByIsbn | []["value"]["tags"] | apply(f"append") |   apply(f"hashset") | println();
+    getData().booksByIsbn
+    | []["value"]["tags"] | apply(f"append") | apply(f"hashset") | println();
 
-    println(i"\nSearch full text of entries for ones that contain a string 'kernigan' and return book titles");
-    getData().booksByIsbn[]["value"] | search "kernigan" | []["title"] | println();
+    println("\nSearch full text of entries for ones that contains",
+            " a string 'kernigan' and return book titles");
+    getData().booksByIsbn[]["value"]
+    | search "kernigan" | []["title"] | println();
 
 
-    println(i"\nSearch entries for ones that have title that contains a string 'Programming Language'");
-    getData().booksByIsbn[]["value"] | search title =~ "Programming Language" | []["title"]| println();
+    println("\nSearch entries for ones that have a title that contains a ",
+            "string 'Programming Language'");
+    getData().booksByIsbn[]["value"]
+    | search title =~ "Programming Language" | []["title"]| println();
 
 
-    println("\nSearch entries for ones that have title that match regex '^The ([A-Za-z0-9]+) Programming Language$'");
-    getData().booksByIsbn[]["value"] | search title =~ r"^The ([A-Za-z0-9]+) Programming Language$" | []["title"]| println();
+    println("\nSearch entries for ones that have title that match the regex ",
+            "'^The ([A-Za-z0-9]+) Programming Language$'");
+    getData().booksByIsbn[]["value"]
+    | search title =~ r"^The ([A-Za-z0-9]+) Programming Language$"
+    | []["title"]
+    | println();
 
-    println("\nSearch entries for ones that have tag 'Programming Language' and published before year 1980");
-    getData().booksByIsbn[]["value"] | search  publicationYear < 1980 and "programming languages" in tags |  println();
+    println("\nSearch entries for ones that have tag 'Programming Language' ",
+            "and published before year 1980");
+    getData().booksByIsbn[]["value"]
+    | search  publicationYear < 1980 and "programming languages" in tags
+    | println();
 
     println("\nSearch entries for ones that have more than one author");
-    getData().booksByIsbn[]["value"] | search  length(authorIds) >= 2 |  fields title, authorIds | println();
+    getData().booksByIsbn[]["value"]
+    | search  length(authorIds) >= 2 |  fields title, authorIds | println();
 
-    println("\nSearch entries for ones that have available copies using subsearch on array of book items");
-    getData().booksByIsbn[]["value"] | search  (bookItems | search not isLent ) |  fields isbn,title | println();
+    println("\nSearch entries for ones that have available copies using ",
+            "subsearch on array of book items");
+    getData().booksByIsbn[]["value"]
+    | search  (bookItems | search not isLent ) |  fields isbn,title | println();
 end;
 
 
@@ -125,7 +142,10 @@ function getData ()
             "978-0262510875": {
                 "isbn": "978-0262510875",
                 "title": "Structure and Interpretation of Computer Programs",
-                "tags" : [ "programming languages", "programming language design", "lisp", "scheme"],
+                "tags" : [ "programming languages",
+                           "programming language design",
+                           "lisp",
+                           "scheme"],
                 "publicationYear": 1996,
                 "authorIds": ["harold-abelson", "jay-sussman"],
                 "bookItems": [

@@ -3,7 +3,7 @@
 
 function  freqcount(seq)
     ## create map of counters
-    local m := hashmap();
+    local m := {};
     ## for each  word in text that matches pattern
     for  word in  seq
         m[word] := m[word] + 1;
