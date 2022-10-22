@@ -34,11 +34,11 @@ expr    :   beblock                                         # beblock_expr
     |       expr  op=( ADDOP | SUBOP ) expr                 # sum_expr
     |       expr  op=( NUMLT | NUMGT | NUMGE | NUMLE ) expr # numcomp_expr
     |       expr  op=( ISSAME | EQUAL | NOTEQUAL | NUMEQUAL) expr  # equality_expr
+    |       expr  DWIM_MATCHES expr                         # dwim_matches_expr
+    |       expr  INOP     expr                             # in_expr
     |       expr  ANDOP    expr                             # and_expr
     |       expr  OROP     expr                             # or_expr
-    |       expr  INOP     expr                             # in_expr
-    |       expr  DWIM_MATCHES expr                         # dwim_matches_expr
-    |       expr  SEARCHOP  expr                            # dwim_search_expr        
+    |       expr  SEARCHOP  expr                            # dwim_search_expr
     |       expr  FIELDSOP  fieldspec (',' fieldspec)*      # fields_expr
 //    |<assoc=right>       expr  ( ASOP SYMBOL)?   '|' rs=expr  { !$rs.text.startsWith("[")  }?         # th_as_expr
     |<assoc=right>       expr   '|' ((vector)+ | expr )     # th_auto_expr        
