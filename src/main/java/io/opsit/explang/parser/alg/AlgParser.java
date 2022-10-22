@@ -1073,27 +1073,28 @@ public class AlgParser implements IParser, IAutoSuggester {
       if (null != ctx.SYMBOL()) {
         return new ASTNLeaf(ctx.SYMBOL().getText(), pctx);
       }
-      throw new RuntimeException("Internal error: failed to parse fspart: not a string and not a symbol");
+      throw new RuntimeException("Internal error: failed to parse fspart: "
+                                 + "expect SYMBOL or STRING token, but got none");
     }
 
     //  fspart ('.' fspart)*  ('(' fieldspec (',' fieldspec)* ')')?  (ASOP fspart)?
     @Override
     public Object visitFieldspec(AlgParserParser.FieldspecContext ctx) {
+      final ParseCtx pctx = makePctx(ctx);
       ASTN dstASTN = null;
       if (ctx.ASOP() != null) {
-        AlgParserParser.FspartContext dst = ctx.fspart(ctx.fspart().size()-1);
+        AlgParserParser.FspartContext dst = ctx.fspart(ctx.fspart().size() - 1);
         dstASTN = (ASTN) visit(dst);
       }
-      final ASTNList src = new ASTNList(list(new ASTNLeaf(symbol("LIST"),makePctx(ctx))), makePctx(ctx));
+      final ASTNList src = new ASTNList(list(new ASTNLeaf(symbol("LIST"),pctx)), pctx);
 
       ASTNList subspecs = null;
       if (ctx.fieldspec().size() > 0) {
-        subspecs = new ASTNList(list(new ASTNLeaf(symbol("LIST"),makePctx(ctx))), makePctx(ctx));
+        subspecs = new ASTNList(list(new ASTNLeaf(symbol("LIST"),makePctx(ctx))), pctx);
         for (int specIdx = 0; specIdx < ctx.fieldspec().size(); specIdx++) {
           subspecs.add((ASTN) visit(ctx.fieldspec(specIdx)));
         }
       }
-
 
       ASTN srcPartASTN = null;
       int numSrcParts = (ctx.fspart().size() - (null == dstASTN ? 0 : 1));
@@ -1114,7 +1115,7 @@ public class AlgParser implements IParser, IAutoSuggester {
         }
       }
 
-      ASTNList specASTN = new ASTNList(list(new ASTNLeaf(symbol("LIST"),makePctx(ctx))), makePctx(ctx));
+      ASTNList specASTN = new ASTNList(list(new ASTNLeaf(symbol("LIST"), pctx)), pctx);
 
       specASTN.add((numSrcParts == 1) ? srcPartASTN : src);
       specASTN.add(dstASTN);
@@ -1136,8 +1137,9 @@ public class AlgParser implements IParser, IAutoSuggester {
       for (int specIdx = 0; specIdx < specsSize; specIdx++) {
         ks.add((ASTN) visit(ctx.fieldspec(specIdx)));
       }
-      ASTNList result =
-        new ASTNList(list(new ASTNLeaf(symbol("DWIM_FIELDS"), pctx), obj, ks), pctx);
+      ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("DWIM_FIELDS"), pctx),
+                                          obj,
+                                          ks), pctx);
       return result;
     }
 
@@ -1171,7 +1173,8 @@ public class AlgParser implements IParser, IAutoSuggester {
     @Override
     public Object visitOptassign(AlgParserParser.OptassignContext ctx) {
       ParseCtx pctx = makePctx(ctx);
-      ASTNList result = new ASTNList(list(new ASTNLeaf(symbol(ctx.SYMBOL().getText()), pctx)), pctx);
+      ASTNList result =
+          new ASTNList(list(new ASTNLeaf(symbol(ctx.SYMBOL().getText()), pctx)), pctx);
       if (null != ctx.expr()) {
         final ASTN val = (ASTN) visit(ctx.expr());
         result.add(val);
@@ -1204,7 +1207,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       ParseCtx pctx = makePctx(ctx);
       final String op = ctx.mod == null ? null : ctx.mod.getText();
       String setx = "SETV";
-      if ( "global".equalsIgnoreCase(op)) {
+      if ("global".equalsIgnoreCase(op)) {
         setx = "SETQ";
       } else if ("local".equalsIgnoreCase(op)) {
         setx = "SETL";
@@ -1804,10 +1807,10 @@ public class AlgParser implements IParser, IAutoSuggester {
                       ? arg.getName()
                       : (formatModifiers(arg)
                          + arg.getName()
-                         + ((flag == ArgSpec.AF.OPTIONAL )
+                         + ((flag == ArgSpec.AF.OPTIONAL)
                             ? ":=" + (null == arg.getInit() ? "NIL" : arg.getInit())
                             : "")
-                         + ((flag == ArgSpec.AF.REST ) ? "..." : "")));
+                         + ((flag == ArgSpec.AF.REST) ? "..." : "")));
         }
       }
       buf.append(argsJoin(posargs));
