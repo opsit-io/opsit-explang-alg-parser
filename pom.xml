@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.opsit</groupId>
   <artifactId>opsit-explang-alg-parser</artifactId>
-  <version>0.0.6</version>
+  <version>0.0.7-SNAPSHOT</version>
 
   <name>Opsit Explang Algebraic Syntax Parser</name>
   <description>Algebraic Syntax Parser for Explang</description>
