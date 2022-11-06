@@ -323,7 +323,21 @@ public class AlgParser implements IParser, IAutoSuggester {
                      + "  expr;\n"
                      + "  ...\n"
                      + "end"),
-    new OperatorDesc("->", "LAMBDA", "( arglist ) -> expr", "var -> expr")
+    new OperatorDesc("->", "LAMBDA", "( arglist ) -> expr", "var -> expr"),
+    new OperatorDesc("try", "TRY", ""
+                     + "try\n"
+                     + "   expr;\n"
+                     + "   ...\n"
+                     + "catch (some.Exception ex)\n"
+                     + "   expr;\n"
+                     + "   ...\n"
+                     + "catch ex\n"
+                     + "   expr;\n"
+                     + "   ...\n"                     
+                     + "finally\n"
+                     + "   expr;\n"
+                     + "   ...\n"
+                     + "end")
   };
 
 
@@ -686,6 +700,61 @@ public class AlgParser implements IParser, IAutoSuggester {
 
     public ExprVisitor(String srcName) {
       this.srcName = srcName;
+    }
+
+    // CATCH ( SYMBOL | '(' clzspec SYMBOL ')' ) block
+    @Override
+    public Object visitCatchspec(AlgParserParser.CatchspecContext ctx) {
+      final ParseCtx pctx = makePctx(ctx);
+      final String varName = ctx.SYMBOL().getText();
+      final ASTN exASTN =  ctx.clzspec() == null
+          ? new ASTNLeaf(symbol(java.lang.Exception.class.getCanonicalName()), pctx)
+          : (ASTN) visit(ctx.clzspec());
+      ASTNList catchASTN = new ASTNList(list(new ASTNLeaf(symbol("CATCH"), pctx),
+                                             exASTN,
+                                             new ASTNLeaf(symbol(varName), pctx)), pctx);
+      final ASTNList catchBlock = (ASTNList) visit(ctx.block());
+      catchASTN.addAll(catchBlock);
+      return catchASTN;
+    }
+
+    //SYMBOL (. SYMBOL )*
+    @Override
+    public Object visitClzspec(AlgParserParser.ClzspecContext ctx) {
+      StringBuilder buf = new StringBuilder();
+      for (TerminalNode part : ctx.SYMBOL()) {
+        if (buf.length() > 0) {
+          buf.append('.');
+        }
+        buf.append(part.getText());
+      }
+      return new ASTNLeaf(symbol(buf.toString()), makePctx(ctx));
+    }
+
+    // TRY block catchspec* (FINALLY block)?  EB
+    @Override
+    public Object visitTry_expr(AlgParserParser.Try_exprContext ctx) {
+      final ParseCtx pctx = makePctx(ctx);
+      ASTNList result = new ASTNList(list(new ASTNLeaf(symbol("TRY"), pctx)), pctx);
+      ASTNList tryBlock = (ASTNList) visit(ctx.block().get(0));
+      result.addAll(tryBlock);
+      if (null != ctx.catchspec()) {
+        for (int idx = 0; idx < ctx.catchspec().size(); idx++) {
+          final ASTN catchASTN = (ASTN) visit(ctx.catchspec(idx));
+          result.add(catchASTN);
+        }
+      }
+      if (null != ctx.FINALLY()) {
+        // FIXME
+        final ParseCtx finallyPctx = pctx;
+        final int idx = ctx.block().size() - 1;
+        ASTNList finallyBlock = (ASTNList) visit(ctx.block().get(idx));
+        ASTNList finallyASTN =
+            new ASTNList(list(new ASTNLeaf(symbol("FINALLY"), finallyPctx)), finallyPctx);
+        finallyASTN.addAll(finallyBlock);
+        result.add(finallyASTN);
+      }
+      return result;
     }
 
     // 'IF' expr block ('ELSEIF' expr block)*  ( 'ELSE' block )? 'END';

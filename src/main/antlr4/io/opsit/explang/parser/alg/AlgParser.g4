@@ -22,6 +22,7 @@ expr    :   beblock                                         # beblock_expr
     |        loopfor                                        # for_expr
     |  LET (optassign (',' optassign)*)? ';'?  block EB     # let_expr
     |  RETURN expr                                          # return_expr
+    |  TRY block catchspec* (FINALLY block)?  EB            # try_expr
     |       expr ( '.' SYMBOL )+                            # dotchain
     |       expr ( vector )+                                # assoc_lookup
     |       lambda                                          # lambda_expr
@@ -63,6 +64,9 @@ lambda   : FUNC SYMBOL? '(' (posargs=exprList rest=ELLIPSIS? )? ( ';' kwargs=exp
 beblock  :  BB block EB                            ;
 replblock : block EOF                              ;
 optassign : SYMBOL (LASSIGN expr)?                 ;
+catchspec : CATCH ( SYMBOL | '(' clzspec SYMBOL ')' ) block  ;
+clzspec   : SYMBOL (. SYMBOL )*                    ;
+
 
 fspart : (SYMBOL | STRING);
 fieldspec : fspart ('.' fspart)*  ('(' fieldspec (',' fieldspec)* ')')?  (ASOP fspart)?;
@@ -73,7 +77,8 @@ block    : expr (';' expr)*  ';'? ;
 fsymbol  : ( SYMBOL
         | ADDOP | SUBOP | ANDOP | OROP | MULOP | DIVOP
         | NUMLT | NUMGT | NUMGE | NUMLE
-        | NUMEQUAL | EQUAL | NOTEQUAL | ISSAME | INOP | DWIM_MATCHES | RESULT | LOCAL | GLOBAL | LET) ;
+        | NUMEQUAL | EQUAL | NOTEQUAL | ISSAME | INOP | DWIM_MATCHES
+        | RESULT | LOCAL | GLOBAL | LET | TRY ) ;
 atom     : ( NIL_LIT | NUMBER | TRUE_LIT | FALSE_LIT | fsymbol  | STRING | REGEXP | SYMFUNC | VERSION );
 
 
@@ -103,6 +108,9 @@ FIELDSOP : [fF][iI][eE][lL][dD][sS];
 FUNC     : [fF][uU][nN][cC][tT][iI][oO][nN] ;
 BB       : [bB][eE][gG][iI][nN];
 EB       : [eE][nN][dD];
+TRY      : [tT][rR][yY];
+CATCH    : [cC][aA][tT][cC][hH];
+FINALLY  : [fF][iI][nN][aA][lL][lL][yY];
 
 ANDOP    : [aA][nN][dD];
 OROP     : [oO][rR];
@@ -114,7 +122,6 @@ NOTOP    : [nN][oO][tT];
 LOCAL    : [lL][oO][cC][aA][lL];
 GLOBAL   : [gG][lL][oO][bB][aA][lL];
 LET      : [lL][eE][tT];
-
 
 SYMBOL   : [A-Za-z_][A-Za-z_0-9!]*;
 //KEYWORD  : [:][A-Za-z_0-9]+;
