@@ -1495,8 +1495,9 @@ public class AlgParser implements IParser, IAutoSuggester {
     public Object visitIn_expr(AlgParserParser.In_exprContext ctx) {
       final Object left = visit(ctx.expr(0));
       final Object right = visit(ctx.expr(1));
-      ParseCtx pctx = makePctx(ctx);
-      final ASTN opASTN = new ASTNLeaf(symbol("IN"), pctx);
+      final ParseCtx pctx = makePctx(ctx);
+      final String symName = ctx.NOTOP() == null ? "IN" : "NOT-IN";
+      final ASTN opASTN = new ASTNLeaf(symbol(symName), pctx);
       ASTN result = new ASTNList(list(opASTN, (ASTN) left, (ASTN) right), pctx);
       return result;
     }

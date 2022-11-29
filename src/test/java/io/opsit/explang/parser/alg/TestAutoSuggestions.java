@@ -55,12 +55,12 @@ public class TestAutoSuggestions extends AbstractTest {
         {"ABA", 3, set("ABACUS") , null},
         {"ABA ", 3, set("==", "===", "=~", "<=", ":=", "OR", "IN", "%",
                         "(", "*", "+", "-", ".", "/", "AND","[",
-                        "!=", "<", "=", ">", ">=", "FIELDS","AS","|","SEARCH","->") , null},
+                        "!=", "<", "=", ">", ">=", "FIELDS","AS","NOT","|","SEARCH","->") , null},
         {"ABACUS ", 6, set("==", "===", "=~", "<=", ":=", "OR", "IN", "%",
                            "(", "*", "+", "-", ".","/", "AND", "[",
-                           "!=", "<", "=", ">", ">=","FIELDS","AS","|","SEARCH","->") , null},// FIXME: -> ABACUS
+                           "!=", "<", "=", ">", ">=","FIELDS","AS","NOT","|","SEARCH","->") , null},// FIXME: -> ABACUS
         {"ABACUS ", 7, set() , null}, // FIXME -> 17 selections
-        {"ABACUS  ", 7, set("==", "===", "=~", "<=", ":=", "OR", "IN", "%",
+        {"ABACUS  ", 7, set("==", "===", "=~", "<=", ":=", "AS","NOT","OR", "IN", "%",
                             "(", "*", "+", "-", ".", "/", "AND", "[",
                             "!=", "<", "=", ">", ">=", "FIELDS","AS","|","SEARCH","->") , null}
       });
