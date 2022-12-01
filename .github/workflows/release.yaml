@@ -23,7 +23,7 @@ jobs:
       - name: Setup java and maven central
         uses: actions/setup-java@v3
         with:
-          java-version: '8'
+          java-version: '11'
           distribution: 'temurin'
           server-id: ossrh
           server-username: OSSRH_USERNAME
