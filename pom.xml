@@ -38,7 +38,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <junit.version>4.13.1</junit.version>
     <antlr4-c3.version>1.1</antlr4-c3.version>
-    <antlr4.version>4.9.3</antlr4.version>    
+    <antlr4.version>4.10.1</antlr4.version>    
   </properties>
 
   <dependencies>
