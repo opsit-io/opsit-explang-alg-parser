@@ -34,7 +34,7 @@ expr    :   beblock                                         # beblock_expr
     |       expr  op=( MULOP | DIVOP | REMOP ) expr         # product_expr
     |       expr  op=( ADDOP | SUBOP ) expr                 # sum_expr
     |       expr  op=( NUMLT | NUMGT | NUMGE | NUMLE ) expr # numcomp_expr
-    |       expr  op=( ISSAME | EQUAL | NOTEQUAL | NUMEQUAL) expr  # equality_expr
+    |       expr  op=( ISSAME | EQUAL | NOTEQUAL | NUMEQUAL | NOTSAME ) expr  # equality_expr
     |       expr  DWIM_MATCHES expr                         # dwim_matches_expr
     |       expr  NOTOP? INOP expr                          # in_expr
     |       expr  ANDOP    expr                             # and_expr
@@ -132,8 +132,9 @@ DOT      : '.' ;
 
 ISSAME   : '==='; 
 EQUAL    : '==';
-NOTEQUAL : '!=';
+NOTSAME  : '!==';
 NUMEQUAL : '=';
+NOTEQUAL : '!=';
 NUMLT    : '<';  
 NUMGT    : '>';  
 NUMGE    : '>='; 

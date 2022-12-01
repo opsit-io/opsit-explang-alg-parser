@@ -53,14 +53,14 @@ public class TestAutoSuggestions extends AbstractTest {
         {"AB", 2, set("ABACUS","ABBA") , null},
         {"ABA", 2, set("ABACUS") , null},
         {"ABA", 3, set("ABACUS") , null},
-        {"ABA ", 3, set("==", "===", "=~", "<=", ":=", "OR", "IN", "%",
+        {"ABA ", 3, set("!==", "==", "===", "=~", "<=", ":=", "OR", "IN", "%",
                         "(", "*", "+", "-", ".", "/", "AND","[",
                         "!=", "<", "=", ">", ">=", "FIELDS","AS","NOT","|","SEARCH","->") , null},
-        {"ABACUS ", 6, set("==", "===", "=~", "<=", ":=", "OR", "IN", "%",
+        {"ABACUS ", 6, set("!==", "==", "===", "=~", "<=", ":=", "OR", "IN", "%",
                            "(", "*", "+", "-", ".","/", "AND", "[",
                            "!=", "<", "=", ">", ">=","FIELDS","AS","NOT","|","SEARCH","->") , null},// FIXME: -> ABACUS
         {"ABACUS ", 7, set() , null}, // FIXME -> 17 selections
-        {"ABACUS  ", 7, set("==", "===", "=~", "<=", ":=", "AS","NOT","OR", "IN", "%",
+        {"ABACUS  ", 7, set("!==", "==", "===", "=~", "<=", ":=", "AS","NOT","OR", "IN", "%",
                             "(", "*", "+", "-", ".", "/", "AND", "[",
                             "!=", "<", "=", ">", ">=", "FIELDS","AS","|","SEARCH","->") , null}
       });

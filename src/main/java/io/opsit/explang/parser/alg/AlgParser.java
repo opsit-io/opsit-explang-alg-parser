@@ -1420,7 +1420,11 @@ public class AlgParser implements IParser, IAutoSuggester {
           opsym = symbol("==");
           break;
         case (AlgParserParser.NOTEQUAL):
-          opsym = symbol("=");
+          opsym = symbol("==");
+          inv = true;
+          break;
+        case (AlgParserParser.NOTSAME):
+          opsym = symbol("===");
           inv = true;
           break;
         default:
