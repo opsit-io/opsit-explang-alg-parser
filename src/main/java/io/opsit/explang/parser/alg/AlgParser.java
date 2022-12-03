@@ -775,18 +775,18 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
 
     // expr as var ( | expr )+
-    @Override
+    /*@Override
     public Object visitTh_at_expr(AlgParserParser.Th_at_exprContext ctx) {
       final ASTN e = (ASTN) visit(ctx.expr());
       return e;
-    }
+      }*/
 
     @Override
     public Object visitTh_auto_expr(AlgParserParser.Th_auto_exprContext ctx) {
       final ParseCtx pctx = makePctx(ctx);
-      if (null != ctx.vector() && ctx.vector().size() > 0) {
-        return transAssocLookups(ctx.expr(0), ctx.vector(), pctx);
-      }
+      //if (null != ctx.vector() && ctx.vector().size() > 0) {
+      //  return transAssocLookups(ctx.expr(0), ctx.vector(), pctx);
+      //}
       final ASTN startExpr = (ASTN) visit(ctx.expr(0));
       final ASTNList result =
           new ASTNList(list(new ASTNLeaf(symbol("@->"), pctx), startExpr), pctx);

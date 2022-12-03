@@ -42,7 +42,8 @@ expr    :   beblock                                         # beblock_expr
     |       expr  SEARCHOP  expr                            # dwim_search_expr
     |       expr  FIELDSOP  fieldspec (',' fieldspec)*      # fields_expr
 //    |<assoc=right>       expr  ( ASOP SYMBOL)?   '|' rs=expr  { !$rs.text.startsWith("[")  }?         # th_as_expr
-    |<assoc=right>       expr   '|' ((vector)+ | expr )     # th_auto_expr        
+//    |       expr   '|' ((vector)+ | expr )?    # th_auto_expr
+    |       expr   '|' expr                         # th_auto_expr                
     |<assoc=right>       expr  ASOP SYMBOL   '|'  expr      # th_as_expr
 
     |       expr '|'                                        # th_at_expr
