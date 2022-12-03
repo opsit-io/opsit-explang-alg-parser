@@ -775,11 +775,11 @@ public class AlgParser implements IParser, IAutoSuggester {
     }
 
     // expr as var ( | expr )+
-    /*@Override
+    @Override
     public Object visitTh_at_expr(AlgParserParser.Th_at_exprContext ctx) {
       final ASTN e = (ASTN) visit(ctx.expr());
       return e;
-      }*/
+    }
 
     @Override
     public Object visitTh_auto_expr(AlgParserParser.Th_auto_exprContext ctx) {
@@ -794,7 +794,7 @@ public class AlgParser implements IParser, IAutoSuggester {
       ASTNList subexprs = null;
 
       ASTN expr = (ASTN) visit(ctx.expr(1));
-      if (expr instanceof ASTNList) {
+      /*if (expr instanceof ASTNList) {
         ASTNList exprList = (ASTNList) expr;
         if (exprList.size() > 0) {
           ASTN first = exprList.get(0);
@@ -806,9 +806,9 @@ public class AlgParser implements IParser, IAutoSuggester {
       }
       if (null != subexprs) {
         result.addAll(subexprs);
-      } else {
-        result.add(expr);
-      }
+        } else {*/
+      result.add(expr);
+        //}
       return result;
     }
 
@@ -819,33 +819,33 @@ public class AlgParser implements IParser, IAutoSuggester {
     // (A | (B | ...X))
     // and then recursively flattened into
     // (-> A B .. X)
-    @Override
-    public Object visitTh_as_expr(AlgParserParser.Th_as_exprContext ctx) {
-      final ParseCtx pctx = makePctx(ctx);
-      final ASTN startExpr = (ASTN) visit(ctx.expr(0));
-      final String varName = ctx.SYMBOL().getText();
-      final ASTNLeaf var = new ASTNLeaf(symbol(varName), pctx);
-      ASTNList result =
-          new ASTNList(list(new ASTNLeaf(symbol("AS->"), pctx), startExpr, var), pctx);
-      ASTNList subexprs = null;
-      ASTN expr = (ASTN) visit(ctx.expr(1));
-      if (expr instanceof ASTNList) {
-        ASTNList exprList = (ASTNList) expr;
-        if (exprList.size() > 0) {
-          ASTN first = exprList.get(0);
-          if (!first.isList() && symbol("@->").equals(first.getObject())) {
-            // ASTN newExpr = new ASTNList(list(), expr.getPctx());
-            subexprs = exprList.subList(1, exprList.size());
-          }
-        }
-      }
-      if (null != subexprs) {
-        result.addAll(subexprs);
-      } else {
-        result.add(expr);
-      }
-      return result;
-    }
+    // @Override
+    // public Object visitTh_as_expr(AlgParserParser.Th_as_exprContext ctx) {
+    //   final ParseCtx pctx = makePctx(ctx);
+    //   final ASTN startExpr = (ASTN) visit(ctx.expr(0));
+    //   final String varName = ctx.SYMBOL().getText();
+    //   final ASTNLeaf var = new ASTNLeaf(symbol(varName), pctx);
+    //   ASTNList result =
+    //       new ASTNList(list(new ASTNLeaf(symbol("AS->"), pctx), startExpr, var), pctx);
+    //   ASTNList subexprs = null;
+    //   ASTN expr = (ASTN) visit(ctx.expr(1));
+    //   if (expr instanceof ASTNList) {
+    //     ASTNList exprList = (ASTNList) expr;
+    //     if (exprList.size() > 0) {
+    //       ASTN first = exprList.get(0);
+    //       if (!first.isList() && symbol("@->").equals(first.getObject())) {
+    //         // ASTN newExpr = new ASTNList(list(), expr.getPctx());
+    //         subexprs = exprList.subList(1, exprList.size());
+    //       }
+    //     }
+    //   }
+    //   if (null != subexprs) {
+    //     result.addAll(subexprs);
+    //   } else {
+    //     result.add(expr);
+    //   }
+    //   return result;
+    // }
 
     @Override
     public Object visitWhile_expr(AlgParserParser.While_exprContext ctx) {

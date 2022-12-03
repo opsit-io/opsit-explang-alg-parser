@@ -43,8 +43,9 @@ expr    :   beblock                                         # beblock_expr
     |       expr  FIELDSOP  fieldspec (',' fieldspec)*      # fields_expr
 //    |<assoc=right>       expr  ( ASOP SYMBOL)?   '|' rs=expr  { !$rs.text.startsWith("[")  }?         # th_as_expr
 //    |       expr   '|' ((vector)+ | expr )?    # th_auto_expr
-    |       expr   '|' expr                         # th_auto_expr                
-    |<assoc=right>       expr  ASOP SYMBOL   '|'  expr      # th_as_expr
+    |       expr  (ASOP SYMBOL)?  '|' expr                   # th_auto_expr
+//    |       expr   '|' vector+                              # th_assoc_expr 
+//    |       expr  ASOP SYMBOL                '|'  expr      # th_as_expr
 
     |       expr '|'                                        # th_at_expr
     |       mod=(LOCAL | GLOBAL)  sym=(LOCAL|GLOBAL|SYMBOL) LASSIGN  expr  # vardecl_expr
