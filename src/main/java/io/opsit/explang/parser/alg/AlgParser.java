@@ -781,34 +781,80 @@ public class AlgParser implements IParser, IAutoSuggester {
       return e;
     }
 
+    // expr  (ASOP SYMBOL)?  '|' expr 
     @Override
     public Object visitTh_auto_expr(AlgParserParser.Th_auto_exprContext ctx) {
       final ParseCtx pctx = makePctx(ctx);
+      // TRICKY PART: the rule should be
+      //              expr  (ASOP SYMBOL)?  '|' ( expr | vector+)
+      //              but we cannot use a vector as alternative in
+      //              the parse rule (then it gets parsed right-
+      //              assotatively for unknown reason (ANTLR BUG?)
+      //              so we need to identify and extract vectors
+      //              and call assoc. operator parsing by hand.
       //if (null != ctx.vector() && ctx.vector().size() > 0) {
-      //  return transAssocLookups(ctx.expr(0), ctx.vector(), pctx);
-      //}
-      final ASTN startExpr = (ASTN) visit(ctx.expr(0));
-      final ASTNList result =
-          new ASTNList(list(new ASTNLeaf(symbol("@->"), pctx), startExpr), pctx);
-      // for (; idx < ctx.getChildCount(); idx+=2) {
-      ASTNList subexprs = null;
-
-      ASTN expr = (ASTN) visit(ctx.expr(1));
-      /*if (expr instanceof ASTNList) {
-        ASTNList exprList = (ASTNList) expr;
-        if (exprList.size() > 0) {
-          ASTN first = exprList.get(0);
-          if (!first.isList() && symbol("@->").equals(first.getObject())) {
-            // ASTN newExpr = new ASTNList(list(), expr.getPctx());
-            subexprs = exprList.subList(1, exprList.size());
+      
+      List<AlgParserParser.VectorContext> vectors = null;
+      final AlgParserParser.ExprContext startExpr = ctx.expr(0);
+      final AlgParserParser.ExprContext expr = ctx.expr(1);
+      
+      int childCount = expr.getChildCount();
+      for (int idx = 0; idx < childCount; idx++) {
+        ParseTree p = expr.getChild(idx);
+        if (idx == 0) {
+          if (p instanceof AlgParserParser.Vector_exprContext) {
+            vectors = list();
+            vectors.add(((AlgParserParser.Vector_exprContext) p).vector());
+          } else if (p instanceof AlgParserParser.VectorContext) {
+            vectors = list();
+            vectors.add((AlgParserParser.VectorContext) p);
+          } else {
+            break;
+          }
+        } else {
+          if (p instanceof AlgParserParser.VectorContext) {
+            vectors.add((AlgParserParser.VectorContext) p);
+          } else {
+            vectors = null;
+            break;
           }
         }
       }
-      if (null != subexprs) {
-        result.addAll(subexprs);
-        } else {*/
-      result.add(expr);
-        //}
+      if (null != vectors) {
+        return transAssocLookups(startExpr, vectors, pctx);
+      }
+      ASTNList result = null;;
+      final ASTN startExprASTN = (ASTN) visit(startExpr);
+      final ASTN exprASTN = (ASTN) visit(expr);
+      // FIXME: ugly 
+      if (startExprASTN instanceof ASTNList) {
+        final ASTNList exprList = (ASTNList) startExprASTN;
+        if (exprList.size() > 0) {
+          final ASTN first = exprList.get(0);
+          if (!first.isList()) {
+            final Object obj = first.getObject();
+            if ((obj instanceof Symbol) 
+                && ("@->".equals(obj.toString()) 
+                  || "AS->".equals(obj.toString()))) {
+              result = exprList;
+            }
+          }
+        }
+      }
+      if (null == result) {
+        if (null != ctx.ASOP()) {
+          final ASTNLeaf var = new ASTNLeaf(symbol(ctx.SYMBOL().getText()), pctx);
+          result = new ASTNList(list(new ASTNLeaf(symbol("AS->"), pctx),
+                                     startExprASTN,
+                                     var),
+                                pctx);
+        } else {
+          result = new ASTNList(list(new ASTNLeaf(symbol("@->"), pctx),
+                                     startExprASTN),
+                                pctx);
+        }
+      }
+      result.add(exprASTN);
       return result;
     }
 
