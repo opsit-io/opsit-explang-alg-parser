@@ -41,12 +41,9 @@ expr    :   beblock                                         # beblock_expr
     |       expr  OROP     expr                             # or_expr
     |       expr  SEARCHOP  expr                            # dwim_search_expr
     |       expr  FIELDSOP  fieldspec (',' fieldspec)*      # fields_expr
-//    |<assoc=right>       expr  ( ASOP SYMBOL)?   '|' rs=expr  { !$rs.text.startsWith("[")  }?         # th_as_expr
+// FIXME: should be with vector, but works right-assoativelu
 //    |       expr   '|' ((vector)+ | expr )?    # th_auto_expr
-    |       expr  (ASOP SYMBOL)?  '|' expr                   # th_auto_expr
-//    |       expr   '|' vector+                              # th_assoc_expr 
-//    |       expr  ASOP SYMBOL                '|'  expr      # th_as_expr
-
+    |       expr  (ASOP SYMBOL)?  '|' expr                  # th_auto_expr
     |       expr '|'                                        # th_at_expr
     |       mod=(LOCAL | GLOBAL)  sym=(LOCAL|GLOBAL|SYMBOL) LASSIGN  expr  # vardecl_expr
     |       expr   LASSIGN  expr                            # assign_expr
