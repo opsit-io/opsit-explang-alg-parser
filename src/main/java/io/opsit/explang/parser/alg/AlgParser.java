@@ -15,6 +15,7 @@ import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_PARENTHESES;
 import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_SYMBOL;
 import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_WHITESPACE;
 
+import org.antlr.v4.runtime.CommonToken;
 import com.vmware.antlr4c3.CodeCompletionCore;
 import com.vmware.antlr4c3.CodeCompletionCore.CandidatesCollection;
 import io.opsit.explang.ASTN;
@@ -1451,11 +1452,43 @@ public class AlgParser implements IParser, IAutoSuggester {
     // expr  op=( EQUAL | NOTEQUAL | NUMEQUAL) expr
     @Override
     public Object visitEquality_expr(AlgParserParser.Equality_exprContext ctx) {
-      final Object left = visit(ctx.expr(0));
-      final Object right = visit(ctx.expr(1));
-      Symbol opsym;
+      final AlgParserParser.ExprContext leftExpr = ctx.expr(0);
+      final AlgParserParser.ExprContext rightExpr = ctx.expr(1);
+      
+      final Token leftStop = leftExpr.getStop();
+      final String leftStopText = leftStop.getText();
+      final int leftStopIdx = leftStop.getStopIndex();
+      final int middleStartIdx = ctx.op.getStartIndex();
+      int opType = ctx.op.getType();
+      //        Interpret a!=b, a!==b  as a != b, a !== b
+      //        and not a! = b, a! == b
+      // Warning: scary tree modification ahead!! 
+      // FIXME: Kluge ON, how do we do it properly on grammar level?
+      // FIXME: same thing must work for auto suggestions
+      if (leftStop.getType() == AlgParserParser.SYMBOL
+          && leftStopText.endsWith("!")
+          && leftStopText.length() > 1
+          && middleStartIdx - leftStopIdx == 1
+          && ( opType == AlgParserParser.EQUAL
+              || opType == AlgParserParser.NUMEQUAL)) {
+        // moves ! to previos token and change operator type accordingly
+        opType = (opType == AlgParserParser.NUMEQUAL)
+          ? AlgParserParser.NOTEQUAL
+          : AlgParserParser.NOTSAME;
+        System.out.println("SYMBOL is "+leftStop.getClass());
+        CommonToken leftStopCT = (CommonToken)leftStop;
+        CommonToken middleCT = (CommonToken)ctx.op;
+        leftStopCT.setText(leftStopText.substring(0, leftStopText.length() - 1 ));
+        leftStopCT.setStopIndex(leftStop.getStopIndex()  - 1);
+        middleCT.setText("!"+middleCT.getText());
+        middleCT.setStartIndex(middleStartIdx - 1);
+        middleCT.setCharPositionInLine(middleCT.getCharPositionInLine() - 1);
+        middleCT.setType(opType);
+      }
+      // Kluge off
       boolean inv = false;
-      switch (ctx.op.getType()) {
+      Symbol opsym;
+      switch (opType) {
         case (AlgParserParser.ISSAME):
           opsym = symbol("===");
           break;
@@ -1476,6 +1509,8 @@ public class AlgParser implements IParser, IAutoSuggester {
         default:
           throw new RuntimeException("Internal error: unexpected operator token " + ctx.op);
       }
+      final Object left = visit(leftExpr);
+      final Object right = visit(rightExpr);
       ParseCtx pctx = makePctx(ctx);
       ASTN result = new ASTNList(list(new ASTNLeaf(opsym, pctx), (ASTN) left, (ASTN) right), pctx);
       if (inv) {
@@ -1747,6 +1782,7 @@ public class AlgParser implements IParser, IAutoSuggester {
                      rctx.start.getCharPositionInLine(),
                      -1,
                      rctx.getText().length());
+
       return pctx;
     }
   }
