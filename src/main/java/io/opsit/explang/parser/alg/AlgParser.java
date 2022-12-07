@@ -15,7 +15,6 @@ import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_PARENTHESES;
 import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_SYMBOL;
 import static io.opsit.explang.autosuggest.LanguageToken.TOKKIND_WHITESPACE;
 
-import org.antlr.v4.runtime.CommonToken;
 import com.vmware.antlr4c3.CodeCompletionCore;
 import com.vmware.antlr4c3.CodeCompletionCore.CandidatesCollection;
 import io.opsit.explang.ASTN;
@@ -60,6 +59,7 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
@@ -340,6 +340,38 @@ public class AlgParser implements IParser, IAutoSuggester {
                      + "   ...\n"
                      + "end")
   };
+
+  /**
+   * Called from the grammar.
+   * Fixes parsed tokens to
+   * interpret a!=b, a!==b  as a != b, a !== b
+   * and not a! = b, a! == b
+   */
+  protected static void fixUnequalityOps(Token left, Token op) {
+    final String leftStopText = left.getText();
+    final int leftStopIdx = left.getStopIndex();
+    final int middleStartIdx = op.getStartIndex();
+    int opType = op.getType();
+    if (left.getType() == AlgParserParser.SYMBOL
+        && leftStopText.endsWith("!")
+        && leftStopText.length() > 1
+        && middleStartIdx - leftStopIdx == 1
+        && (opType == AlgParserParser.EQUAL
+             || opType == AlgParserParser.NUMEQUAL)) {
+      // moves ! to previos token and change operator type accordingly
+      opType = (opType == AlgParserParser.NUMEQUAL)
+        ? AlgParserParser.NOTEQUAL
+        : AlgParserParser.NOTSAME;
+      CommonToken leftStopCT = (CommonToken)left;
+      CommonToken middleCT = (CommonToken)op;
+      leftStopCT.setText(leftStopText.substring(0, leftStopText.length() - 1));
+      leftStopCT.setStopIndex(left.getStopIndex()  - 1);
+      middleCT.setText("!" + middleCT.getText());
+      middleCT.setStartIndex(middleStartIdx - 1);
+      middleCT.setCharPositionInLine(middleCT.getCharPositionInLine() - 1);
+      middleCT.setType(opType);
+    }
+  }
 
 
   @Override
@@ -1449,43 +1481,12 @@ public class AlgParser implements IParser, IAutoSuggester {
       return result;
     }
 
-    // expr  op=( EQUAL | NOTEQUAL | NUMEQUAL) expr
+    // left=expr  op=( ISSAME | EQUAL | NOTEQUAL | NUMEQUAL | NOTSAME ) expr    
     @Override
     public Object visitEquality_expr(AlgParserParser.Equality_exprContext ctx) {
       final AlgParserParser.ExprContext leftExpr = ctx.expr(0);
       final AlgParserParser.ExprContext rightExpr = ctx.expr(1);
-      
-      final Token leftStop = leftExpr.getStop();
-      final String leftStopText = leftStop.getText();
-      final int leftStopIdx = leftStop.getStopIndex();
-      final int middleStartIdx = ctx.op.getStartIndex();
-      int opType = ctx.op.getType();
-      //        Interpret a!=b, a!==b  as a != b, a !== b
-      //        and not a! = b, a! == b
-      // Warning: scary tree modification ahead!! 
-      // FIXME: Kluge ON, how do we do it properly on grammar level?
-      // FIXME: same thing must work for auto suggestions
-      if (leftStop.getType() == AlgParserParser.SYMBOL
-          && leftStopText.endsWith("!")
-          && leftStopText.length() > 1
-          && middleStartIdx - leftStopIdx == 1
-          && ( opType == AlgParserParser.EQUAL
-              || opType == AlgParserParser.NUMEQUAL)) {
-        // moves ! to previos token and change operator type accordingly
-        opType = (opType == AlgParserParser.NUMEQUAL)
-          ? AlgParserParser.NOTEQUAL
-          : AlgParserParser.NOTSAME;
-        System.out.println("SYMBOL is "+leftStop.getClass());
-        CommonToken leftStopCT = (CommonToken)leftStop;
-        CommonToken middleCT = (CommonToken)ctx.op;
-        leftStopCT.setText(leftStopText.substring(0, leftStopText.length() - 1 ));
-        leftStopCT.setStopIndex(leftStop.getStopIndex()  - 1);
-        middleCT.setText("!"+middleCT.getText());
-        middleCT.setStartIndex(middleStartIdx - 1);
-        middleCT.setCharPositionInLine(middleCT.getCharPositionInLine() - 1);
-        middleCT.setType(opType);
-      }
-      // Kluge off
+      final int opType = ctx.op.getType();
       boolean inv = false;
       Symbol opsym;
       switch (opType) {
